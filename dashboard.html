@@ -321,6 +321,29 @@
 
         .team-info-header {
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .close-panel-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-panel-btn:hover {
+            background: #ffffff;
+            color: #000000;
         }
 
         .team-info-title {
@@ -1093,6 +1116,16 @@
                 padding: 20px;
             }
             
+            .close-panel-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.3rem;
+            }
+            
+            .team-info-header {
+                padding-right: 45px;
+            }
+            
             .invite-link-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -1182,6 +1215,16 @@
                 padding: 15px;
                 margin: 10px;
             }
+            
+            .close-panel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.4rem;
+            }
+            
+            .team-info-header {
+                padding-right: 50px;
+            }
         }
     </style>
 </head>
@@ -1256,6 +1299,7 @@
             <div class="team-info-header">
                 <div class="team-info-title" id="teamInfoTitle">Frontend Team</div>
                 <div class="team-info-description" id="teamInfoDescription">Команда разработки фронтенда</div>
+                <button class="close-panel-btn" id="closePanelBtn" title="Закрыть">×</button>
             </div>
             
             <div class="team-info-section">
@@ -1616,6 +1660,17 @@
                 const regenerateBtn = document.getElementById('regenerateBtn');
                 regenerateBtn.addEventListener('click', () => {
                     this.regenerateInviteLink();
+                });
+
+                // Добавляем обработчик для кнопки закрытия панели
+                const closePanelBtn = document.getElementById('closePanelBtn');
+                closePanelBtn.addEventListener('click', () => {
+                    this.hideTeamInfoPanel();
+                    this.selectedTeam = null;
+                    // Снимаем выделение с выбранной команды
+                    this.teamCards.forEach(card => {
+                        card.classList.remove('selected');
+                    });
                 });
 
                 // Добавляем обработчики для детальных панелей
