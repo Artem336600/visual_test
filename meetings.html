@@ -1029,8 +1029,32 @@
                 selectedItem.classList.add('active');
                 
                 const section = selectedItem.dataset.section;
-                if (section !== 'meetings') {
-                    window.location.href = 'dashboard.html';
+                this.navigateToSection(section);
+            }
+
+            navigateToSection(section) {
+                this.closeSidebar();
+                
+                switch(section) {
+                    case 'teams':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'tasks':
+                        window.location.href = 'tasks.html';
+                        break;
+                    case 'schedule':
+                        window.location.href = 'schedule.html';
+                        break;
+                    case 'notes':
+                        window.location.href = 'notes.html';
+                        break;
+                    case 'meetings':
+                        // Уже на странице встреч
+                        break;
+                    case 'settings':
+                        // Пока не реализовано
+                        alert('Страница "Настройки" пока не реализована');
+                        break;
                 }
             }
 
