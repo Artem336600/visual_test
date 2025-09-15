@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заметки - Deligate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000000;
+            border-bottom: 1px solid #ffffff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon span {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-icon.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .notification-icon,
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-icon {
+            border-radius: 0;
+        }
+
+        .notification-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 2px;
+        }
+
+        .notification-icon::after {
+            content: '3';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ffffff;
+            color: #000000;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 100;
+        }
+
+        .profile-icon {
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .profile-icon::before {
+            content: 'АИ';
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: none;
+        }
+
+        .notification-icon:hover,
+        .profile-icon:hover {
+            background: #ffffff;
+        }
+
+        .notification-icon:hover::before,
+        .profile-icon:hover::before {
+            color: #000000;
+        }
+
+        /* Боковое меню */
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #000000;
+            border-right: 1px solid #ffffff;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0.8;
+        }
+
+        .tools-section {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tool-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 20px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .tool-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .tool-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .text-input-section {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .text-input-section.active {
+            display: block;
+        }
+
+        .text-input {
+            width: 100%;
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 20px;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .text-input:focus {
+            outline: none;
+        }
+
+        .submit-btn {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #ffffff;
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .analysis-section {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .analysis-section.active {
+            display: block;
+        }
+
+        .analysis-text {
+            font-size: 1.2rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 30px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .result-section {
+            display: none;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-card {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .result-content {
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tags-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .connections-section {
+            margin-bottom: 20px;
+        }
+
+        .connection-item {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .connection-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .connection-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 5px;
+        }
+
+        .connection-type {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .graph-section {
+            margin-bottom: 30px;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-node {
+            fill: #ffffff;
+            stroke: #ffffff;
+            stroke-width: 2;
+            cursor: pointer;
+        }
+
+        .graph-link {
+            stroke: #ffffff;
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+
+        .graph-text {
+            fill: #ffffff;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .action-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .action-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .action-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            
+            .tools-section {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .tool-btn {
+                min-width: 250px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .input-section {
+                margin-bottom: 20px;
+            }
+            
+            .text-input {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .file-btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .analysis-section {
+                padding: 15px;
+            }
+            
+            .analysis-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+            }
+            
+            .result-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .formatted-content {
+                padding: 12px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            
+            .tags-section, .connections-section {
+                margin-top: 15px;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            
+            .tag, .connection {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                margin: 4px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .main-title {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+            
+            .tools-section {
+                gap: 12px;
+            }
+            
+            .tool-btn {
+                min-width: 200px;
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .input-section {
+                margin-bottom: 15px;
+            }
+            
+            .text-input {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .file-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .analysis-section, .result-section {
+                padding: 12px;
+            }
+            
+            .analysis-title, .result-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .formatted-content {
+                padding: 10px;
+                font-size: 0.8rem;
+                line-height: 1.3;
+            }
+            
+            .tags-section, .connections-section {
+                margin-top: 12px;
+            }
+            
+            .section-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .tag, .connection {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                margin: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon" id="menuIcon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logo">Deligate</div>
+        <div class="header-icons">
+            <div class="notification-icon"></div>
+            <div class="profile-icon"></div>
+        </div>
+    </div>
+
+    <!-- Боковое меню -->
+    <div class="sidebar" id="sidebar">
+        <ul class="menu-list">
+            <li class="menu-item" data-section="teams">Команды</li>
+            <li class="menu-item" data-section="tasks">Задачи</li>
+            <li class="menu-item" data-section="schedule">Расписание</li>
+            <li class="menu-item active" data-section="notes">Заметки</li>
+            <li class="menu-item" data-section="meetings">Встречи</li>
+            <li class="menu-item" data-section="settings">Настройки</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="main-title">Смотрите в Obsidian</div>
+        
+        <div class="tools-section">
+            <button class="tool-btn" id="textBtn">Прикрепить текст</button>
+            <button class="tool-btn" id="audioBtn">Записать аудио</button>
+            <button class="tool-btn" id="fileBtn">Отправить файл</button>
+        </div>
+
+        <div class="text-input-section" id="textInputSection">
+            <textarea class="text-input" id="textInput" placeholder="Введите текст заметки..."></textarea>
+            <button class="submit-btn" id="submitTextBtn">Анализировать</button>
+        </div>
+
+        <div class="analysis-section" id="analysisSection">
+            <div class="analysis-text">Анализ...</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-card">
+                <div class="result-title">Предложенное оформление</div>
+                <div class="result-content" id="formattedContent"></div>
+                <div class="tags-section" id="tagsSection"></div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-title">Предлагаемые связи</div>
+                <div class="connections-section" id="connectionsSection"></div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-title">Граф связей</div>
+                <div class="graph-section">
+                    <div class="graph-container">
+                        <svg class="graph-svg" id="graphSvg"></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn" id="editBtn">Редактировать</button>
+                <button class="action-btn primary" id="saveObsidianBtn">Сохранить в Obsidian</button>
+                <button class="action-btn" id="applyConnectionsBtn">Применить связи</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NotesManager {
+            constructor() {
+                this.isSidebarOpen = false;
+                this.currentContent = '';
+                this.mockNotes = [
+                    { id: 1, title: 'Встреча с клиентом', content: 'Обсуждение требований к проекту', tags: ['встреча', 'клиент', 'проект'] },
+                    { id: 2, title: 'Техническое задание', content: 'Детальное описание функционала', tags: ['документация', 'техзадание'] },
+                    { id: 3, title: 'Архитектура системы', content: 'Схема компонентов и их взаимодействие', tags: ['архитектура', 'диаграмма'] },
+                    { id: 4, title: 'План разработки', content: 'Этапы и сроки реализации', tags: ['план', 'разработка', 'сроки'] },
+                    { id: 5, title: 'Тестирование', content: 'Стратегия и методы тестирования', tags: ['тестирование', 'качество'] }
+                ];
+                
+                this.mockProjects = [
+                    { id: 1, name: 'Frontend Team', description: 'Разработка пользовательского интерфейса' },
+                    { id: 2, name: 'Backend Team', description: 'Серверная часть приложения' },
+                    { id: 3, name: 'Design Team', description: 'Дизайн и UX' }
+                ];
+                
+                this.mockTasks = [
+                    { id: 1, title: 'Создать компонент навигации', project: 'Frontend Team' },
+                    { id: 2, title: 'Настроить API endpoints', project: 'Backend Team' },
+                    { id: 3, title: 'Разработать макеты', project: 'Design Team' }
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupSidebar();
+                this.setupEventListeners();
+            }
+
+            setupSidebar() {
+                const menuIcon = document.getElementById('menuIcon');
+                const sidebar = document.getElementById('sidebar');
+                const menuItems = document.querySelectorAll('.menu-item');
+
+                menuIcon.addEventListener('click', () => {
+                    this.toggleSidebar();
+                });
+
+                menuItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const section = item.dataset.section;
+                        this.navigateToSection(section);
+                    });
+                });
+            }
+
+            setupEventListeners() {
+                const textBtn = document.getElementById('textBtn');
+                const audioBtn = document.getElementById('audioBtn');
+                const fileBtn = document.getElementById('fileBtn');
+                const submitTextBtn = document.getElementById('submitTextBtn');
+                const editBtn = document.getElementById('editBtn');
+                const saveObsidianBtn = document.getElementById('saveObsidianBtn');
+                const applyConnectionsBtn = document.getElementById('applyConnectionsBtn');
+
+                textBtn.addEventListener('click', () => {
+                    this.showTextInput();
+                });
+
+                audioBtn.addEventListener('click', () => {
+                    this.simulateAudioRecording();
+                });
+
+                fileBtn.addEventListener('click', () => {
+                    this.simulateFileUpload();
+                });
+
+                submitTextBtn.addEventListener('click', () => {
+                    this.analyzeContent();
+                });
+
+                editBtn.addEventListener('click', () => {
+                    this.editContent();
+                });
+
+                saveObsidianBtn.addEventListener('click', () => {
+                    this.saveToObsidian();
+                });
+
+                applyConnectionsBtn.addEventListener('click', () => {
+                    this.applyConnections();
+                });
+            }
+
+            toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.add('open');
+                menuIcon.classList.add('active');
+                this.isSidebarOpen = true;
+            }
+
+            closeSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.remove('open');
+                menuIcon.classList.remove('active');
+                this.isSidebarOpen = false;
+            }
+
+            navigateToSection(section) {
+                this.closeSidebar();
+                
+                switch(section) {
+                    case 'teams':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'tasks':
+                        window.location.href = 'tasks.html';
+                        break;
+                    case 'notes':
+                        // Уже на странице заметок
+                        break;
+                    case 'schedule':
+                        window.location.href = 'schedule.html';
+                        break;
+                    case 'meetings':
+                        alert('Страница "Встречи" пока не реализована');
+                        break;
+                    case 'settings':
+                        alert('Страница "Настройки" пока не реализована');
+                        break;
+                }
+            }
+
+            showTextInput() {
+                const textInputSection = document.getElementById('textInputSection');
+                textInputSection.classList.add('active');
+            }
+
+            simulateAudioRecording() {
+                const audioBtn = document.getElementById('audioBtn');
+                audioBtn.textContent = 'Запись...';
+                audioBtn.disabled = true;
+
+                setTimeout(() => {
+                    audioBtn.textContent = 'Записать аудио';
+                    audioBtn.disabled = false;
+                    this.currentContent = 'Запись аудио: Обсуждение проекта, основные требования, сроки реализации.';
+                    this.analyzeContent();
+                }, 3000);
+            }
+
+            simulateFileUpload() {
+                const fileBtn = document.getElementById('fileBtn');
+                fileBtn.textContent = 'Загрузка...';
+                fileBtn.disabled = true;
+
+                setTimeout(() => {
+                    fileBtn.textContent = 'Отправить файл';
+                    fileBtn.disabled = false;
+                    this.currentContent = 'Файл: Документ с техническими требованиями, схемами архитектуры и планом разработки.';
+                    this.analyzeContent();
+                }, 2000);
+            }
+
+            analyzeContent() {
+                const textInput = document.getElementById('textInput');
+                if (textInput.value.trim()) {
+                    this.currentContent = textInput.value.trim();
+                }
+
+                if (!this.currentContent) {
+                    alert('Введите текст для анализа');
+                    return;
+                }
+
+                this.showAnalysis();
+                
+                setTimeout(() => {
+                    this.showResults();
+                }, 2500);
+            }
+
+            showAnalysis() {
+                const analysisSection = document.getElementById('analysisSection');
+                analysisSection.classList.add('active');
+            }
+
+            showResults() {
+                const analysisSection = document.getElementById('analysisSection');
+                const resultSection = document.getElementById('resultSection');
+                
+                analysisSection.classList.remove('active');
+                resultSection.classList.add('active');
+
+                this.generateFormattedContent();
+                this.generateTags();
+                this.generateConnections();
+                this.generateGraph();
+            }
+
+            generateFormattedContent() {
+                const formattedContent = document.getElementById('formattedContent');
+                const templates = [
+                    `# ${this.currentContent.split(' ').slice(0, 3).join(' ')}\n\n${this.currentContent}\n\n## Ключевые моменты\n- Основная идея\n- Важные детали\n- Следующие шаги`,
+                    `## Заметка\n\n${this.currentContent}\n\n### Связанные темы\n- Тема 1\n- Тема 2\n- Тема 3`,
+                    `# ${this.currentContent.split(' ')[0]}\n\n> ${this.currentContent}\n\n## Анализ\nДанная информация связана с несколькими проектами и требует дальнейшего изучения.`
+                ];
+                
+                formattedContent.textContent = templates[Math.floor(Math.random() * templates.length)];
+            }
+
+            generateTags() {
+                const tagsSection = document.getElementById('tagsSection');
+                const allTags = ['проект', 'встреча', 'документация', 'техзадание', 'архитектура', 'разработка', 'тестирование', 'клиент', 'план', 'сроки'];
+                const selectedTags = allTags.sort(() => 0.5 - Math.random()).slice(0, 4);
+                
+                tagsSection.innerHTML = '';
+                selectedTags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = `#${tag}`;
+                    tagsSection.appendChild(tagElement);
+                });
+            }
+
+            generateConnections() {
+                const connectionsSection = document.getElementById('connectionsSection');
+                const connections = [];
+                
+                // Добавляем случайные заметки
+                const randomNotes = this.mockNotes.sort(() => 0.5 - Math.random()).slice(0, 2);
+                randomNotes.forEach(note => {
+                    connections.push({
+                        title: note.title,
+                        type: 'Заметка',
+                        relevance: Math.floor(Math.random() * 100) + 50
+                    });
+                });
+                
+                // Добавляем случайные проекты
+                const randomProjects = this.mockProjects.sort(() => 0.5 - Math.random()).slice(0, 1);
+                randomProjects.forEach(project => {
+                    connections.push({
+                        title: project.name,
+                        type: 'Проект',
+                        relevance: Math.floor(Math.random() * 100) + 50
+                    });
+                });
+                
+                // Добавляем случайные задачи
+                const randomTasks = this.mockTasks.sort(() => 0.5 - Math.random()).slice(0, 1);
+                randomTasks.forEach(task => {
+                    connections.push({
+                        title: task.title,
+                        type: 'Задача',
+                        relevance: Math.floor(Math.random() * 100) + 50
+                    });
+                });
+                
+                connectionsSection.innerHTML = '';
+                connections.forEach(connection => {
+                    const connectionElement = document.createElement('div');
+                    connectionElement.className = 'connection-item';
+                    connectionElement.innerHTML = `
+                        <div class="connection-title">${connection.title}</div>
+                        <div class="connection-type">${connection.type} • Релевантность: ${connection.relevance}%</div>
+                    `;
+                    connectionsSection.appendChild(connectionElement);
+                });
+            }
+
+            generateGraph() {
+                const svg = document.getElementById('graphSvg');
+                svg.innerHTML = '';
+                
+                const width = svg.clientWidth;
+                const height = svg.clientHeight;
+                
+                // Центральный узел (текущая заметка)
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Создаем центральный узел
+                const centerNode = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                centerNode.setAttribute('cx', centerX);
+                centerNode.setAttribute('cy', centerY);
+                centerNode.setAttribute('r', 20);
+                centerNode.setAttribute('class', 'graph-node');
+                svg.appendChild(centerNode);
+                
+                const centerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                centerText.setAttribute('x', centerX);
+                centerText.setAttribute('y', centerY);
+                centerText.setAttribute('class', 'graph-text');
+                centerText.textContent = 'Новая';
+                svg.appendChild(centerText);
+                
+                // Создаем связанные узлы
+                const nodeCount = 5;
+                for (let i = 0; i < nodeCount; i++) {
+                    const angle = (i * 2 * Math.PI) / nodeCount;
+                    const radius = Math.min(width, height) * 0.3;
+                    const nodeX = centerX + radius * Math.cos(angle);
+                    const nodeY = centerY + radius * Math.sin(angle);
+                    
+                    // Создаем связь
+                    const link = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    link.setAttribute('x1', centerX);
+                    link.setAttribute('y1', centerY);
+                    link.setAttribute('x2', nodeX);
+                    link.setAttribute('y2', nodeY);
+                    link.setAttribute('class', 'graph-link');
+                    svg.appendChild(link);
+                    
+                    // Создаем узел
+                    const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    node.setAttribute('cx', nodeX);
+                    node.setAttribute('cy', nodeY);
+                    node.setAttribute('r', 15);
+                    node.setAttribute('class', 'graph-node');
+                    svg.appendChild(node);
+                    
+                    // Создаем текст узла
+                    const nodeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    nodeText.setAttribute('x', nodeX);
+                    nodeText.setAttribute('y', nodeY);
+                    nodeText.setAttribute('class', 'graph-text');
+                    nodeText.textContent = this.mockNotes[i]?.title.split(' ')[0] || `Узел${i+1}`;
+                    svg.appendChild(nodeText);
+                }
+            }
+
+            editContent() {
+                const formattedContent = document.getElementById('formattedContent');
+                const currentContent = formattedContent.textContent;
+                
+                const newContent = prompt('Редактировать содержимое:', currentContent);
+                if (newContent !== null) {
+                    formattedContent.textContent = newContent;
+                }
+            }
+
+            saveToObsidian() {
+                const saveBtn = document.getElementById('saveObsidianBtn');
+                saveBtn.textContent = 'Сохранение...';
+                saveBtn.disabled = true;
+                
+                setTimeout(() => {
+                    saveBtn.textContent = 'Сохранено в Obsidian';
+                    setTimeout(() => {
+                        saveBtn.textContent = 'Сохранить в Obsidian';
+                        saveBtn.disabled = false;
+                    }, 2000);
+                }, 1500);
+            }
+
+            applyConnections() {
+                const applyBtn = document.getElementById('applyConnectionsBtn');
+                applyBtn.textContent = 'Применение...';
+                applyBtn.disabled = true;
+                
+                setTimeout(() => {
+                    applyBtn.textContent = 'Связи применены';
+                    setTimeout(() => {
+                        applyBtn.textContent = 'Применить связи';
+                        applyBtn.disabled = false;
+                    }, 2000);
+                }, 1000);
+            }
+        }
+
+        // Запускаем приложение после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new NotesManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deligate - Встречи</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 100;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000000;
+            border-bottom: 1px solid #ffffff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-line {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.active .menu-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-icon.active .menu-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.active .menu-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ffffff;
+        }
+
+        .icon:hover {
+            background: #ffffff;
+        }
+
+        .profile-icon {
+            border: none;
+        }
+
+        .profile-icon:hover {
+            background: transparent;
+        }
+
+        .profile-icon::before {
+            content: 'АИ';
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #000000;
+            border-right: 1px solid #ffffff;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-item.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .main-content {
+            padding: 30px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .main-content.sidebar-open {
+            margin-left: 250px;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .meetings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .meeting-card {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .meeting-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .meeting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .meeting-title {
+            font-size: 1.1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+        }
+
+        .meeting-type {
+            background: #ffffff;
+            color: #000000;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .meeting-date {
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .add-meeting-btn {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 15px 30px;
+            font-family: inherit;
+            font-weight: 100;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .add-meeting-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #000000;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.8) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons.vertical {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .modal-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .recording-modal {
+            max-width: 800px;
+        }
+
+        .recording-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .record-btn {
+            background: #ff4444;
+            color: #ffffff;
+            border: 1px solid #ff4444;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .record-btn.recording {
+            animation: pulse 1.5s infinite;
+        }
+
+        .record-btn:hover {
+            background: #ff6666;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .recording-status {
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .transcript-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ffffff;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .transcript-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 3px solid #ffffff;
+            padding-left: 15px;
+        }
+
+        .transcript-speaker {
+            font-weight: 100;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .transcript-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .analysis-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-option {
+            flex: 1;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .analysis-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .analysis-option.selected {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .graph-container {
+            border: 1px solid #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .graph-node {
+            position: absolute;
+            background: #ffffff;
+            color: #000000;
+            padding: 10px 15px;
+            border-radius: 0;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .graph-node.center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 100;
+        }
+
+        .graph-node.branch {
+            font-size: 0.8rem;
+            padding: 8px 12px;
+        }
+
+        .graph-line {
+            position: absolute;
+            background: #ffffff;
+            height: 2px;
+            transform-origin: left center;
+        }
+
+        .tasks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .tasks-table th,
+        .tasks-table td {
+            border: 1px solid #ffffff;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .tasks-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 100;
+        }
+
+        .task-status {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .task-status.pending {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .task-status.in-progress {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .task-status.completed {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .file-label:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .create-meeting-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .meetings-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .meeting-card {
+                padding: 15px;
+            }
+            
+            .meeting-title {
+                font-size: 1rem;
+            }
+            
+            .meeting-time {
+                font-size: 0.8rem;
+            }
+            
+            .meeting-participants {
+                font-size: 0.75rem;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .modal-form {
+                gap: 12px;
+            }
+            
+            .modal-input {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .analysis-options {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .analysis-option {
+                padding: 15px;
+            }
+            
+            .option-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            
+            .option-description {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            
+            .analysis-section {
+                padding: 15px;
+            }
+            
+            .analysis-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+            }
+            
+            .result-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .formatted-content {
+                padding: 12px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            .content-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+            
+            .create-meeting-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .meetings-grid {
+                gap: 10px;
+            }
+            
+            .meeting-card {
+                padding: 12px;
+            }
+            
+            .meeting-title {
+                font-size: 0.9rem;
+            }
+            
+            .meeting-time {
+                font-size: 0.75rem;
+            }
+            
+            .meeting-participants {
+                font-size: 0.7rem;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .modal-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .modal-form {
+                gap: 10px;
+            }
+            
+            .modal-input {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+            
+            .analysis-options {
+                gap: 12px;
+            }
+            
+            .analysis-option {
+                padding: 12px;
+            }
+            
+            .option-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .option-description {
+                font-size: 0.8rem;
+                line-height: 1.3;
+            }
+            
+            .analysis-section, .result-section {
+                padding: 12px;
+            }
+            
+            .analysis-title, .result-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .formatted-content {
+                padding: 10px;
+                font-size: 0.8rem;
+                line-height: 1.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon" id="menuIcon">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+        <div class="logo">Deligate</div>
+        <div class="header-right">
+            <div class="icon profile-icon" id="profileIcon"></div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <ul class="menu-items">
+            <li class="menu-item" data-section="teams">Команды</li>
+            <li class="menu-item" data-section="tasks">Задачи</li>
+            <li class="menu-item" data-section="schedule">Расписание</li>
+            <li class="menu-item" data-section="notes">Заметки</li>
+            <li class="menu-item active" data-section="meetings">Встречи</li>
+            <li class="menu-item" data-section="settings">Настройки</li>
+        </ul>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="main-content" id="mainContent">
+        <div class="content-title">
+            <span>Встречи</span>
+        </div>
+        
+        <div class="meetings-list" id="meetingsList">
+            <!-- Mock данные встреч -->
+        </div>
+        
+        <button class="add-meeting-btn" id="addMeetingBtn">Добавить встречу</button>
+    </div>
+
+    <!-- Модальное окно выбора типа встречи -->
+    <div class="modal-overlay" id="meetingTypeModal">
+        <div class="modal">
+            <div class="modal-title">Добавить встречу</div>
+            <div class="modal-buttons vertical">
+                <button class="modal-btn" id="recordMeetingBtn">Записать встречу</button>
+                <button class="modal-btn" id="uploadTranscriptBtn">Отправить транскрибацию</button>
+                <button class="modal-btn" id="uploadAudioBtn">Прикрепить аудио</button>
+                <button class="modal-btn" id="cancelMeetingBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно записи встречи -->
+    <div class="modal-overlay" id="recordingModal">
+        <div class="modal recording-modal">
+            <button class="close-btn" id="closeRecordingBtn">×</button>
+            <div class="modal-title">Запись встречи</div>
+            
+            <div class="recording-controls">
+                <button class="record-btn" id="recordBtn">●</button>
+                <div class="recording-status" id="recordingStatus">Готов к записи</div>
+            </div>
+            
+            <div class="transcript-container" id="transcriptContainer">
+                <div class="transcript-item">
+                    <div class="transcript-speaker">Система</div>
+                    <div class="transcript-text">Нажмите кнопку записи для начала транскрибации</div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn" id="stopRecordingBtn" disabled>Остановить запись</button>
+                <button class="modal-btn primary" id="analyzeRecordingBtn" disabled>Анализировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно загрузки аудио -->
+    <div class="modal-overlay" id="audioUploadModal">
+        <div class="modal">
+            <button class="close-btn" id="closeAudioBtn">×</button>
+            <div class="modal-title">Прикрепить аудио</div>
+            
+            <div style="margin-bottom: 20px;">
+                <input type="file" class="file-input" id="audioFileInput" accept="audio/*">
+                <label for="audioFileInput" class="file-label">Выбрать аудио файл</label>
+            </div>
+            
+            <div class="transcript-container" id="audioTranscriptContainer" style="display: none;">
+                <div class="transcript-item">
+                    <div class="transcript-speaker">Система</div>
+                    <div class="transcript-text">Обработка аудио файла...</div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn" id="processAudioBtn" disabled>Обработать аудио</button>
+                <button class="modal-btn primary" id="analyzeAudioBtn" disabled>Анализировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно анализа -->
+    <div class="modal-overlay" id="analysisModal">
+        <div class="modal" style="max-width: 900px;">
+            <button class="close-btn" id="closeAnalysisBtn">×</button>
+            <div class="modal-title">Анализ встречи</div>
+            
+            <div class="analysis-options">
+                <button class="analysis-option selected" id="keyPointsBtn">Ключевые моменты</button>
+                <button class="analysis-option" id="tasksBtn">Распределение задач</button>
+            </div>
+            
+            <div id="analysisContent">
+                <!-- Контент анализа будет загружен динамически -->
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn" id="sendTasksBtn" style="display: none;">Отправить задачи участникам</button>
+                <button class="modal-btn primary" id="saveAnalysisBtn">Сохранить анализ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра встречи -->
+    <div class="modal-overlay" id="meetingViewModal">
+        <div class="modal" style="max-width: 900px;">
+            <button class="close-btn" id="closeMeetingViewBtn">×</button>
+            <div class="modal-title" id="meetingViewTitle">Просмотр встречи</div>
+            
+            <div id="meetingViewContent">
+                <!-- Контент встречи будет загружен динамически -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MeetingsApp {
+            constructor() {
+                this.menuIcon = document.getElementById('menuIcon');
+                this.sidebar = document.getElementById('sidebar');
+                this.overlay = document.getElementById('overlay');
+                this.mainContent = document.getElementById('mainContent');
+                this.menuItems = document.querySelectorAll('.menu-item');
+                this.isSidebarOpen = false;
+                this.isRecording = false;
+                this.recordingInterval = null;
+                this.currentTranscript = [];
+                this.currentAnalysis = null;
+                this.addMeetingBtn = null;
+                
+                // Mock данные встреч
+                this.meetings = [
+                    {
+                        id: 1,
+                        title: "Планирование спринта",
+                        type: "Планирование",
+                        date: "2024-01-15",
+                        transcript: [
+                            { speaker: "Алексей", text: "Давайте обсудим задачи на следующий спринт" },
+                            { speaker: "Мария", text: "У нас есть несколько приоритетных задач по фронтенду" },
+                            { speaker: "Дмитрий", text: "Я могу взять на себя работу с API" },
+                            { speaker: "Алексей", text: "Отлично, тогда Мария займется UI компонентами" }
+                        ],
+                        analysis: {
+                            keyPoints: [
+                                "Планирование задач на спринт",
+                                "Распределение ролей в команде",
+                                "Приоритизация фронтенд задач"
+                            ],
+                            tasks: [
+                                { title: "Разработка API endpoints", responsible: "Дмитрий", deadline: "2024-01-25", status: "pending" },
+                                { title: "Создание UI компонентов", responsible: "Мария", deadline: "2024-01-22", status: "pending" }
+                            ]
+                        }
+                    },
+                    {
+                        id: 2,
+                        title: "Ретроспектива проекта",
+                        type: "Ретроспектива",
+                        date: "2024-01-10",
+                        transcript: [
+                            { speaker: "Ольга", text: "Что прошло хорошо в этом спринте?" },
+                            { speaker: "Павел", text: "Команда работала слаженно, все задачи выполнены в срок" },
+                            { speaker: "Ольга", text: "Есть ли что-то, что можно улучшить?" },
+                            { speaker: "Павел", text: "Нужно больше времени на тестирование" }
+                        ],
+                        analysis: {
+                            keyPoints: [
+                                "Положительная оценка работы команды",
+                                "Выполнение задач в срок",
+                                "Необходимость увеличения времени на тестирование"
+                            ],
+                            tasks: [
+                                { title: "Увеличить время на тестирование", responsible: "QA Team", deadline: "2024-01-30", status: "in-progress" }
+                            ]
+                        }
+                    }
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.menuIcon.addEventListener('click', () => {
+                    this.toggleSidebar();
+                });
+
+                this.overlay.addEventListener('click', () => {
+                    this.closeSidebar();
+                });
+
+                this.menuItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.selectMenuItem(item);
+                    });
+                });
+
+                // Получаем элемент после инициализации
+                this.addMeetingBtn = document.getElementById('addMeetingBtn');
+                this.addMeetingBtn.addEventListener('click', () => {
+                    this.showMeetingTypeModal();
+                });
+
+                this.setupModalListeners();
+                this.loadMeetings();
+            }
+
+            toggleSidebar() {
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                this.sidebar.classList.add('open');
+                this.overlay.classList.add('active');
+                this.mainContent.classList.add('sidebar-open');
+                this.menuIcon.classList.add('active');
+                this.isSidebarOpen = true;
+            }
+
+            closeSidebar() {
+                this.sidebar.classList.remove('open');
+                this.overlay.classList.remove('active');
+                this.mainContent.classList.remove('sidebar-open');
+                this.menuIcon.classList.remove('active');
+                this.isSidebarOpen = false;
+            }
+
+            selectMenuItem(selectedItem) {
+                this.menuItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                selectedItem.classList.add('active');
+                
+                const section = selectedItem.dataset.section;
+                if (section !== 'meetings') {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+
+            loadMeetings() {
+                const meetingsList = document.getElementById('meetingsList');
+                meetingsList.innerHTML = '';
+
+                this.meetings.forEach(meeting => {
+                    const meetingCard = document.createElement('div');
+                    meetingCard.className = 'meeting-card';
+                    meetingCard.innerHTML = `
+                        <div class="meeting-header">
+                            <div class="meeting-title">${meeting.title}</div>
+                            <div class="meeting-type">${meeting.type}</div>
+                        </div>
+                        <div class="meeting-date">${new Date(meeting.date).toLocaleDateString('ru-RU')}</div>
+                    `;
+                    
+                    meetingCard.addEventListener('click', () => {
+                        this.showMeetingView(meeting);
+                    });
+                    
+                    meetingsList.appendChild(meetingCard);
+                });
+            }
+
+            setupModalListeners() {
+                // Модальное окно выбора типа встречи
+                document.getElementById('recordMeetingBtn').addEventListener('click', () => {
+                    this.hideMeetingTypeModal();
+                    this.showRecordingModal();
+                });
+
+                document.getElementById('uploadTranscriptBtn').addEventListener('click', () => {
+                    this.hideMeetingTypeModal();
+                    this.showTranscriptModal();
+                });
+
+                document.getElementById('uploadAudioBtn').addEventListener('click', () => {
+                    this.hideMeetingTypeModal();
+                    this.showAudioUploadModal();
+                });
+
+                document.getElementById('cancelMeetingBtn').addEventListener('click', () => {
+                    this.hideMeetingTypeModal();
+                });
+
+                // Модальное окно записи
+                document.getElementById('recordBtn').addEventListener('click', () => {
+                    this.toggleRecording();
+                });
+
+                document.getElementById('stopRecordingBtn').addEventListener('click', () => {
+                    this.stopRecording();
+                });
+
+                document.getElementById('analyzeRecordingBtn').addEventListener('click', () => {
+                    this.showAnalysisModal();
+                });
+
+                document.getElementById('closeRecordingBtn').addEventListener('click', () => {
+                    this.hideRecordingModal();
+                });
+
+                // Модальное окно загрузки аудио
+                document.getElementById('audioFileInput').addEventListener('change', (e) => {
+                    this.handleAudioFile(e.target.files[0]);
+                });
+
+                document.getElementById('processAudioBtn').addEventListener('click', () => {
+                    this.processAudioFile();
+                });
+
+                document.getElementById('analyzeAudioBtn').addEventListener('click', () => {
+                    this.showAnalysisModal();
+                });
+
+                document.getElementById('closeAudioBtn').addEventListener('click', () => {
+                    this.hideAudioUploadModal();
+                });
+
+                // Модальное окно анализа
+                document.getElementById('keyPointsBtn').addEventListener('click', () => {
+                    this.showKeyPointsAnalysis();
+                });
+
+                document.getElementById('tasksBtn').addEventListener('click', () => {
+                    this.showTasksAnalysis();
+                });
+
+                document.getElementById('sendTasksBtn').addEventListener('click', () => {
+                    this.sendTasksToParticipants();
+                });
+
+                document.getElementById('saveAnalysisBtn').addEventListener('click', () => {
+                    this.saveAnalysis();
+                });
+
+                document.getElementById('closeAnalysisBtn').addEventListener('click', () => {
+                    this.hideAnalysisModal();
+                });
+
+                // Модальное окно просмотра встречи
+                document.getElementById('closeMeetingViewBtn').addEventListener('click', () => {
+                    this.hideMeetingViewModal();
+                });
+
+                // Закрытие модальных окон при клике вне их
+                this.setupModalCloseListeners();
+            }
+
+            setupModalCloseListeners() {
+                const modals = [
+                    'meetingTypeModal', 'recordingModal', 'audioUploadModal', 
+                    'analysisModal', 'meetingViewModal'
+                ];
+
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            this.hideModal(modalId);
+                        }
+                    });
+                });
+            }
+
+            showMeetingTypeModal() {
+                document.getElementById('meetingTypeModal').classList.add('active');
+            }
+
+            hideMeetingTypeModal() {
+                document.getElementById('meetingTypeModal').classList.remove('active');
+            }
+
+            showRecordingModal() {
+                document.getElementById('recordingModal').classList.add('active');
+                this.resetRecordingState();
+            }
+
+            hideRecordingModal() {
+                document.getElementById('recordingModal').classList.remove('active');
+                this.stopRecording();
+            }
+
+            showAudioUploadModal() {
+                document.getElementById('audioUploadModal').classList.add('active');
+            }
+
+            hideAudioUploadModal() {
+                document.getElementById('audioUploadModal').classList.remove('active');
+            }
+
+            showAnalysisModal() {
+                document.getElementById('analysisModal').classList.add('active');
+                this.showKeyPointsAnalysis();
+            }
+
+            hideAnalysisModal() {
+                document.getElementById('analysisModal').classList.remove('active');
+            }
+
+            showMeetingViewModal() {
+                document.getElementById('meetingViewModal').classList.add('active');
+            }
+
+            hideMeetingViewModal() {
+                document.getElementById('meetingViewModal').classList.remove('active');
+            }
+
+            hideModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+
+            resetRecordingState() {
+                this.isRecording = false;
+                this.currentTranscript = [];
+                document.getElementById('recordingStatus').textContent = 'Готов к записи';
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('stopRecordingBtn').disabled = true;
+                document.getElementById('analyzeRecordingBtn').disabled = true;
+                
+                const transcriptContainer = document.getElementById('transcriptContainer');
+                transcriptContainer.innerHTML = `
+                    <div class="transcript-item">
+                        <div class="transcript-speaker">Система</div>
+                        <div class="transcript-text">Нажмите кнопку записи для начала транскрибации</div>
+                    </div>
+                `;
+            }
+
+            toggleRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            }
+
+            startRecording() {
+                this.isRecording = true;
+                document.getElementById('recordingStatus').textContent = 'Запись...';
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('stopRecordingBtn').disabled = false;
+                
+                // Имитация записи и транскрибации
+                this.recordingInterval = setInterval(() => {
+                    this.simulateSpeechRecognition();
+                }, 3000);
+            }
+
+            stopRecording() {
+                this.isRecording = false;
+                document.getElementById('recordingStatus').textContent = 'Запись остановлена';
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('stopRecordingBtn').disabled = true;
+                document.getElementById('analyzeRecordingBtn').disabled = false;
+                
+                if (this.recordingInterval) {
+                    clearInterval(this.recordingInterval);
+                    this.recordingInterval = null;
+                }
+            }
+
+            simulateSpeechRecognition() {
+                const speakers = ['Алексей', 'Мария', 'Дмитрий', 'Ольга', 'Павел'];
+                const phrases = [
+                    'Давайте обсудим план на следующую неделю',
+                    'У нас есть несколько важных задач',
+                    'Я думаю, нужно пересмотреть приоритеты',
+                    'Согласен, это хорошая идея',
+                    'Можем ли мы ускорить процесс разработки?',
+                    'Нужно больше времени на тестирование',
+                    'Команда работает очень эффективно',
+                    'Есть ли какие-то блокеры?'
+                ];
+
+                const speaker = speakers[Math.floor(Math.random() * speakers.length)];
+                const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+                
+                this.addTranscriptItem(speaker, phrase);
+            }
+
+            addTranscriptItem(speaker, text) {
+                this.currentTranscript.push({ speaker, text });
+                
+                const transcriptContainer = document.getElementById('transcriptContainer');
+                const transcriptItem = document.createElement('div');
+                transcriptItem.className = 'transcript-item';
+                transcriptItem.innerHTML = `
+                    <div class="transcript-speaker">${speaker}</div>
+                    <div class="transcript-text">${text}</div>
+                `;
+                
+                transcriptContainer.appendChild(transcriptItem);
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+            }
+
+            handleAudioFile(file) {
+                if (file) {
+                    document.getElementById('processAudioBtn').disabled = false;
+                    document.getElementById('audioTranscriptContainer').style.display = 'block';
+                }
+            }
+
+            processAudioFile() {
+                // Имитация обработки аудио файла
+                const container = document.getElementById('audioTranscriptContainer');
+                container.innerHTML = `
+                    <div class="transcript-item">
+                        <div class="transcript-speaker">Система</div>
+                        <div class="transcript-text">Обработка аудио файла...</div>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    // Имитация результата транскрибации
+                    this.currentTranscript = [
+                        { speaker: 'Алексей', text: 'Добро пожаловать на встречу по планированию' },
+                        { speaker: 'Мария', text: 'Спасибо, давайте начнем с обзора задач' },
+                        { speaker: 'Дмитрий', text: 'У нас есть несколько приоритетных проектов' },
+                        { speaker: 'Алексей', text: 'Отлично, давайте распределим роли' }
+                    ];
+
+                    container.innerHTML = '';
+                    this.currentTranscript.forEach(item => {
+                        const transcriptItem = document.createElement('div');
+                        transcriptItem.className = 'transcript-item';
+                        transcriptItem.innerHTML = `
+                            <div class="transcript-speaker">${item.speaker}</div>
+                            <div class="transcript-text">${item.text}</div>
+                        `;
+                        container.appendChild(transcriptItem);
+                    });
+
+                    document.getElementById('analyzeAudioBtn').disabled = false;
+                }, 2000);
+            }
+
+            showKeyPointsAnalysis() {
+                document.getElementById('keyPointsBtn').classList.add('selected');
+                document.getElementById('tasksBtn').classList.remove('selected');
+                document.getElementById('sendTasksBtn').style.display = 'none';
+
+                const analysisContent = document.getElementById('analysisContent');
+                analysisContent.innerHTML = `
+                    <div class="graph-container">
+                        <div class="graph-node center">Планирование спринта</div>
+                        <div class="graph-node branch" style="top: 20%; left: 20%;">Распределение задач</div>
+                        <div class="graph-node branch" style="top: 20%; right: 20%;">Приоритизация</div>
+                        <div class="graph-node branch" style="bottom: 20%; left: 20%;">Временные рамки</div>
+                        <div class="graph-node branch" style="bottom: 20%; right: 20%;">Ресурсы команды</div>
+                        
+                        <div class="graph-line" style="top: 50%; left: 50%; width: 100px; transform: rotate(-45deg);"></div>
+                        <div class="graph-line" style="top: 50%; left: 50%; width: 100px; transform: rotate(45deg);"></div>
+                        <div class="graph-line" style="top: 50%; left: 50%; width: 100px; transform: rotate(-135deg);"></div>
+                        <div class="graph-line" style="top: 50%; left: 50%; width: 100px; transform: rotate(135deg);"></div>
+                    </div>
+                `;
+            }
+
+            showTasksAnalysis() {
+                document.getElementById('tasksBtn').classList.add('selected');
+                document.getElementById('keyPointsBtn').classList.remove('selected');
+                document.getElementById('sendTasksBtn').style.display = 'block';
+
+                const analysisContent = document.getElementById('analysisContent');
+                analysisContent.innerHTML = `
+                    <table class="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>Задача</th>
+                                <th>Ответственный</th>
+                                <th>Срок</th>
+                                <th>Статус</th>
+                                <th>Контекст</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Разработка API endpoints</td>
+                                <td>Дмитрий</td>
+                                <td>25.01.2024</td>
+                                <td><span class="task-status pending">В ожидании</span></td>
+                                <td>Обсуждалось в начале встречи</td>
+                            </tr>
+                            <tr>
+                                <td>Создание UI компонентов</td>
+                                <td>Мария</td>
+                                <td>22.01.2024</td>
+                                <td><span class="task-status pending">В ожидании</span></td>
+                                <td>Приоритетная задача для фронтенда</td>
+                            </tr>
+                            <tr>
+                                <td>Тестирование функциональности</td>
+                                <td>QA Team</td>
+                                <td>30.01.2024</td>
+                                <td><span class="task-status in-progress">В работе</span></td>
+                                <td>Увеличить время на тестирование</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            showMeetingView(meeting) {
+                document.getElementById('meetingViewTitle').textContent = meeting.title;
+                
+                const content = document.getElementById('meetingViewContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 10px;">
+                            ${meeting.type} • ${new Date(meeting.date).toLocaleDateString('ru-RU')}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; letter-spacing: 0.05em;">Транскрибация</h3>
+                        <div class="transcript-container">
+                            ${meeting.transcript.map(item => `
+                                <div class="transcript-item">
+                                    <div class="transcript-speaker">${item.speaker}</div>
+                                    <div class="transcript-text">${item.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; letter-spacing: 0.05em;">Ключевые моменты</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${meeting.analysis.keyPoints.map(point => `
+                                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                    ${point}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                this.showMeetingViewModal();
+            }
+
+            sendTasksToParticipants() {
+                alert('Задачи отправлены участникам встречи');
+            }
+
+            saveAnalysis() {
+                // Создаем новую встречу на основе анализа
+                const newMeeting = {
+                    id: this.meetings.length + 1,
+                    title: `Встреча ${new Date().toLocaleDateString('ru-RU')}`,
+                    type: 'Записанная',
+                    date: new Date().toISOString().split('T')[0],
+                    transcript: this.currentTranscript,
+                    analysis: {
+                        keyPoints: ['Планирование задач', 'Распределение ролей', 'Временные рамки'],
+                        tasks: [
+                            { title: 'Разработка API', responsible: 'Дмитрий', deadline: '2024-01-25', status: 'pending' },
+                            { title: 'UI компоненты', responsible: 'Мария', deadline: '2024-01-22', status: 'pending' }
+                        ]
+                    }
+                };
+
+                this.meetings.unshift(newMeeting);
+                this.loadMeetings();
+                this.hideAnalysisModal();
+                alert('Анализ встречи сохранен');
+            }
+        }
+
+        // Запускаем приложение после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new MeetingsApp();
+        });
+    </script>
+</body>
+</html>

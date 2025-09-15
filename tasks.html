@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задачи - Deligate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000000;
+            border-bottom: 1px solid #ffffff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon span {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-icon.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .notification-icon,
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-icon {
+            border-radius: 0;
+        }
+
+        .notification-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 2px;
+        }
+
+        .notification-icon::after {
+            content: '3';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ffffff;
+            color: #000000;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 100;
+        }
+
+        .profile-icon {
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .profile-icon::before {
+            content: 'АИ';
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: none;
+        }
+
+        .notification-icon:hover,
+        .profile-icon:hover {
+            background: #ffffff;
+        }
+
+        .notification-icon:hover::before,
+        .profile-icon:hover::before {
+            color: #000000;
+        }
+
+        /* Боковое меню */
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #000000;
+            border-right: 1px solid #ffffff;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .team-selector {
+            margin-bottom: 30px;
+        }
+
+        .team-selector select {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 15px;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            min-width: 200px;
+        }
+
+        .team-selector select:focus {
+            outline: none;
+        }
+
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .kanban-column {
+            min-width: 250px;
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 15px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .column-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+        }
+
+        .add-task-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-task-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-card {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .task-title {
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .task-responsible {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .task-deadline {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .task-description {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .column-content {
+            min-height: 200px;
+        }
+
+        .column-content.drag-over {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed #ffffff;
+        }
+
+        /* Модальное окно для создания/редактирования задач */
+        .task-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .task-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .task-modal-content {
+            background: #000000;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.8) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .task-modal.active .task-modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .task-modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-form input,
+        .task-form textarea,
+        .task-form select {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .task-form input:focus,
+        .task-form textarea:focus,
+        .task-form select:focus {
+            outline: none;
+            border-color: #ffffff;
+        }
+
+        .task-form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .task-form-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .task-form-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-form-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-form-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .team-selector {
+                margin-bottom: 20px;
+            }
+            
+            .team-selector select {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .kanban-board {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .kanban-column {
+                min-width: auto;
+            }
+            
+            .column-header {
+                padding: 10px 0;
+            }
+            
+            .column-title {
+                font-size: 0.9rem;
+            }
+            
+            .add-task-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 0.9rem;
+            }
+            
+            .task-card {
+                padding: 12px;
+            }
+            
+            .task-title {
+                font-size: 0.85rem;
+            }
+            
+            .task-responsible, .task-deadline {
+                font-size: 0.75rem;
+            }
+            
+            .task-description {
+                font-size: 0.75rem;
+            }
+            
+            .task-modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .task-form {
+                gap: 12px;
+            }
+            
+            .task-form input,
+            .task-form textarea,
+            .task-form select {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .task-form-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .team-selector {
+                margin-bottom: 15px;
+            }
+            
+            .kanban-board {
+                gap: 10px;
+            }
+            
+            .kanban-column {
+                padding: 10px;
+            }
+            
+            .task-card {
+                padding: 10px;
+            }
+            
+            .task-modal-content {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .task-form {
+                gap: 10px;
+            }
+            
+            .task-form input,
+            .task-form textarea,
+            .task-form select {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon" id="menuIcon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logo">Deligate</div>
+        <div class="header-icons">
+            <div class="notification-icon"></div>
+            <div class="profile-icon"></div>
+        </div>
+    </div>
+
+    <!-- Боковое меню -->
+    <div class="sidebar" id="sidebar">
+        <ul class="menu-list">
+            <li class="menu-item" data-section="teams">Команды</li>
+            <li class="menu-item active" data-section="tasks">Задачи</li>
+            <li class="menu-item" data-section="schedule">Расписание</li>
+            <li class="menu-item" data-section="notes">Заметки</li>
+            <li class="menu-item" data-section="meetings">Встречи</li>
+            <li class="menu-item" data-section="settings">Настройки</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="team-selector">
+            <select id="teamSelector">
+                <option value="">Выберите команду</option>
+            </select>
+        </div>
+        
+        <div class="kanban-board" id="kanbanBoard">
+            <div class="kanban-column" data-status="todo">
+                <div class="column-header">
+                    <div class="column-title">ToDo</div>
+                    <button class="add-task-btn" id="addTaskBtn">+</button>
+                </div>
+                <div class="column-content" id="todoColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="inprocess">
+                <div class="column-header">
+                    <div class="column-title">InProcess</div>
+                </div>
+                <div class="column-content" id="inprocessColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="testing">
+                <div class="column-header">
+                    <div class="column-title">Testing</div>
+                </div>
+                <div class="column-content" id="testingColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="remake">
+                <div class="column-header">
+                    <div class="column-title">Remake</div>
+                </div>
+                <div class="column-content" id="remakeColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="done">
+                <div class="column-header">
+                    <div class="column-title">Done</div>
+                </div>
+                <div class="column-content" id="doneColumn"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для задач -->
+    <div class="task-modal" id="taskModal">
+        <div class="task-modal-content">
+            <div class="task-modal-title" id="taskModalTitle">Создать задачу</div>
+            <form class="task-form" id="taskForm">
+                <input type="text" id="taskTitleInput" placeholder="Название задачи" required>
+                <textarea id="taskDescriptionInput" placeholder="Описание задачи" rows="3"></textarea>
+                <select id="taskResponsibleInput" required>
+                    <option value="">Выберите ответственного</option>
+                </select>
+                <input type="date" id="taskDeadlineInput" required>
+                <div class="task-form-buttons">
+                    <button type="button" class="task-form-btn" id="cancelTaskBtn">Отмена</button>
+                    <button type="submit" class="task-form-btn primary" id="saveTaskBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class TasksManager {
+            constructor() {
+                this.currentUser = 'Алексей Иванов';
+                this.currentTaskId = 100;
+                this.selectedTeamForTasks = null;
+                this.isSidebarOpen = false;
+                
+                // Mock-данные для команд
+                this.teams = {
+                    '1': {
+                        name: 'Frontend Team',
+                        description: 'Команда разработки фронтенда',
+                        members: ['Алексей Иванов', 'Мария Петрова', 'Дмитрий Сидоров']
+                    },
+                    '2': {
+                        name: 'Backend Team',
+                        description: 'Команда разработки бэкенда',
+                        members: ['Иван Козлов', 'Елена Морозова', 'Анна Лебедева']
+                    },
+                    '3': {
+                        name: 'Design Team',
+                        description: 'Команда дизайна и UX',
+                        members: ['Ольга Новикова', 'Павел Соколов']
+                    },
+                    '4': {
+                        name: 'QA Team',
+                        description: 'Команда тестирования',
+                        members: ['Татьяна Попова', 'Андрей Федоров', 'Наталья Медведева']
+                    },
+                    '5': {
+                        name: 'DevOps Team',
+                        description: 'Команда инфраструктуры',
+                        members: ['Владимир Орлов', 'Светлана Зайцева']
+                    },
+                    '6': {
+                        name: 'Marketing Team',
+                        description: 'Команда маркетинга',
+                        members: ['Роман Смирнов', 'Юлия Кузнецова', 'Михаил Васильев']
+                    }
+                };
+                
+                // Роли пользователей в командах
+                this.userRoles = {
+                    '1': 'Участник',
+                    '2': 'Админ',
+                    '3': 'Участник',
+                    '4': 'Участник',
+                    '5': 'Участник',
+                    '6': 'Участник'
+                };
+                
+                // Mock-данные для задач
+                this.tasks = {
+                    '1': [
+                        { id: '1-1', title: 'Создать компонент навигации', description: 'Разработать основной компонент навигации для приложения', responsible: 'Алексей Иванов', deadline: '2024-01-15', status: 'todo' },
+                        { id: '1-2', title: 'Настроить роутинг', description: 'Настроить маршрутизацию между страницами', responsible: 'Мария Петрова', deadline: '2024-01-20', status: 'inprocess' },
+                        { id: '1-3', title: 'Добавить аутентификацию', description: 'Реализовать систему входа и регистрации', responsible: 'Дмитрий Сидоров', deadline: '2024-01-25', status: 'testing' },
+                        { id: '1-4', title: 'Создать дашборд', description: 'Разработать главную страницу приложения', responsible: 'Алексей Иванов', deadline: '2024-01-30', status: 'done' }
+                    ],
+                    '2': [
+                        { id: '2-1', title: 'Создать REST endpoints', description: 'Разработать API endpoints для основных функций', responsible: 'Иван Козлов', deadline: '2024-01-18', status: 'todo' },
+                        { id: '2-2', title: 'Добавить валидацию', description: 'Реализовать валидацию входных данных', responsible: 'Елена Морозова', deadline: '2024-01-22', status: 'inprocess' },
+                        { id: '2-3', title: 'Добавить тесты', description: 'Написать unit и integration тесты', responsible: 'Анна Лебедева', deadline: '2024-01-28', status: 'testing' }
+                    ],
+                    '3': [
+                        { id: '3-1', title: 'Создать макеты', description: 'Разработать дизайн-макеты для всех страниц', responsible: 'Ольга Новикова', deadline: '2024-01-16', status: 'todo' },
+                        { id: '3-2', title: 'Разработать прототипы', description: 'Создать интерактивные прототипы', responsible: 'Павел Соколов', deadline: '2024-01-24', status: 'inprocess' }
+                    ],
+                    '4': [
+                        { id: '4-1', title: 'Настроить Selenium', description: 'Настроить автоматизированное тестирование', responsible: 'Татьяна Попова', deadline: '2024-01-19', status: 'todo' },
+                        { id: '4-2', title: 'Создать тесты API', description: 'Написать тесты для API endpoints', responsible: 'Андрей Федоров', deadline: '2024-01-26', status: 'inprocess' }
+                    ],
+                    '5': [
+                        { id: '5-1', title: 'Настроить Jenkins', description: 'Настроить CI/CD pipeline', responsible: 'Владимир Орлов', deadline: '2024-01-17', status: 'todo' },
+                        { id: '5-2', title: 'Создать pipeline', description: 'Создать pipeline для автоматического деплоя', responsible: 'Светлана Зайцева', deadline: '2024-01-23', status: 'inprocess' }
+                    ],
+                    '6': [
+                        { id: '6-1', title: 'Разработать стратегию', description: 'Создать маркетинговую стратегию', responsible: 'Роман Смирнов', deadline: '2024-01-21', status: 'todo' },
+                        { id: '6-2', title: 'Создать контент', description: 'Подготовить контент для кампании', responsible: 'Юлия Кузнецова', deadline: '2024-01-27', status: 'inprocess' }
+                    ]
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupSidebar();
+                this.populateTeamSelector();
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+            }
+
+            setupEventListeners() {
+                const teamSelector = document.getElementById('teamSelector');
+                const addTaskBtn = document.getElementById('addTaskBtn');
+                const taskModal = document.getElementById('taskModal');
+                const taskForm = document.getElementById('taskForm');
+                const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+
+                teamSelector.addEventListener('change', (e) => {
+                    this.selectedTeamForTasks = e.target.value;
+                    this.loadTasksForTeam(e.target.value);
+                });
+
+                addTaskBtn.addEventListener('click', () => {
+                    this.showTaskModal();
+                });
+
+                cancelTaskBtn.addEventListener('click', () => {
+                    this.hideTaskModal();
+                });
+
+                taskForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveTask();
+                });
+
+                taskModal.addEventListener('click', (e) => {
+                    if (e.target === taskModal) {
+                        this.hideTaskModal();
+                    }
+                });
+            }
+
+            populateTeamSelector() {
+                const teamSelector = document.getElementById('teamSelector');
+                teamSelector.innerHTML = '<option value="">Выберите команду</option>';
+                
+                Object.keys(this.teams).forEach(teamId => {
+                    const team = this.teams[teamId];
+                    const option = document.createElement('option');
+                    option.value = teamId;
+                    option.textContent = team.name;
+                    teamSelector.appendChild(option);
+                });
+            }
+
+            loadTasksForTeam(teamId) {
+                if (!teamId) return;
+
+                const tasks = this.tasks[teamId] || [];
+                const userRole = this.getUserRoleInTeam(teamId);
+                const isAdmin = userRole === 'Админ' || userRole === 'Создатель';
+
+                // Очищаем все колонки
+                const columns = ['todo', 'inprocess', 'testing', 'remake', 'done'];
+                columns.forEach(status => {
+                    const column = document.getElementById(`${status}Column`);
+                    column.innerHTML = '';
+                });
+
+                // Фильтруем задачи в зависимости от роли
+                const filteredTasks = isAdmin ? tasks : tasks.filter(task => task.responsible === this.currentUser);
+
+                // Добавляем задачи в соответствующие колонки
+                filteredTasks.forEach(task => {
+                    this.addTaskToColumn(task);
+                });
+
+                // Обновляем список ответственных
+                this.updateResponsibleList(teamId);
+            }
+
+            addTaskToColumn(task) {
+                const column = document.getElementById(`${task.status}Column`);
+                const taskCard = this.createTaskCard(task);
+                column.appendChild(taskCard);
+            }
+
+            createTaskCard(task) {
+                const card = document.createElement('div');
+                card.className = 'task-card';
+                card.draggable = true;
+                card.dataset.taskId = task.id;
+
+                const userRole = this.getUserRoleInTeam(this.selectedTeamForTasks);
+                const isAdmin = userRole === 'Админ' || userRole === 'Создатель';
+
+                card.innerHTML = `
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-responsible">${task.responsible}</div>
+                    <div class="task-deadline">${new Date(task.deadline).toLocaleDateString('ru-RU')}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                `;
+
+                // Добавляем обработчики
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', task.id);
+                    card.classList.add('dragging');
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
+                if (isAdmin) {
+                    card.addEventListener('click', () => {
+                        this.editTask(task);
+                    });
+                }
+
+                return card;
+            }
+
+            setupDragAndDrop() {
+                const columns = document.querySelectorAll('.column-content');
+                
+                columns.forEach(column => {
+                    column.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        column.classList.add('drag-over');
+                    });
+
+                    column.addEventListener('dragleave', () => {
+                        column.classList.remove('drag-over');
+                    });
+
+                    column.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        column.classList.remove('drag-over');
+                        
+                        const taskId = e.dataTransfer.getData('text/plain');
+                        const newStatus = column.parentElement.dataset.status;
+                        
+                        this.moveTask(taskId, newStatus);
+                    });
+                });
+            }
+
+            moveTask(taskId, newStatus) {
+                if (!this.selectedTeamForTasks) return;
+
+                const tasks = this.tasks[this.selectedTeamForTasks];
+                const task = tasks.find(t => t.id === taskId);
+                
+                if (task) {
+                    task.status = newStatus;
+                    this.loadTasksForTeam(this.selectedTeamForTasks);
+                }
+            }
+
+            showTaskModal(task = null) {
+                const modal = document.getElementById('taskModal');
+                const title = document.getElementById('taskModalTitle');
+                const form = document.getElementById('taskForm');
+                
+                if (task) {
+                    title.textContent = 'Редактировать задачу';
+                    document.getElementById('taskTitleInput').value = task.title;
+                    document.getElementById('taskDescriptionInput').value = task.description || '';
+                    document.getElementById('taskResponsibleInput').value = task.responsible;
+                    document.getElementById('taskDeadlineInput').value = task.deadline;
+                } else {
+                    title.textContent = 'Создать задачу';
+                    form.reset();
+                }
+                
+                modal.classList.add('active');
+            }
+
+            hideTaskModal() {
+                const modal = document.getElementById('taskModal');
+                modal.classList.remove('active');
+            }
+
+            saveTask() {
+                const title = document.getElementById('taskTitleInput').value.trim();
+                const description = document.getElementById('taskDescriptionInput').value.trim();
+                const responsible = document.getElementById('taskResponsibleInput').value;
+                const deadline = document.getElementById('taskDeadlineInput').value;
+
+                if (!title || !responsible || !deadline) {
+                    alert('Пожалуйста, заполните все обязательные поля');
+                    return;
+                }
+
+                if (!this.selectedTeamForTasks) {
+                    alert('Выберите команду');
+                    return;
+                }
+
+                const newTask = {
+                    id: `task-${this.currentTaskId++}`,
+                    title,
+                    description,
+                    responsible,
+                    deadline,
+                    status: 'todo'
+                };
+
+                if (!this.tasks[this.selectedTeamForTasks]) {
+                    this.tasks[this.selectedTeamForTasks] = [];
+                }
+
+                this.tasks[this.selectedTeamForTasks].push(newTask);
+                this.loadTasksForTeam(this.selectedTeamForTasks);
+                this.hideTaskModal();
+            }
+
+            editTask(task) {
+                this.showTaskModal(task);
+            }
+
+            updateResponsibleList(teamId) {
+                const responsibleSelect = document.getElementById('taskResponsibleInput');
+                const team = this.teams[teamId];
+                
+                responsibleSelect.innerHTML = '<option value="">Выберите ответственного</option>';
+                
+                if (team && team.members) {
+                    team.members.forEach(member => {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = member;
+                        responsibleSelect.appendChild(option);
+                    });
+                }
+            }
+
+            getUserRoleInTeam(teamId) {
+                return this.userRoles[teamId] || 'Участник';
+            }
+
+            setupSidebar() {
+                const menuIcon = document.getElementById('menuIcon');
+                const sidebar = document.getElementById('sidebar');
+                const menuItems = document.querySelectorAll('.menu-item');
+
+                menuIcon.addEventListener('click', () => {
+                    this.toggleSidebar();
+                });
+
+                menuItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const section = item.dataset.section;
+                        this.navigateToSection(section);
+                    });
+                });
+            }
+
+            toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.add('open');
+                menuIcon.classList.add('active');
+                this.isSidebarOpen = true;
+            }
+
+            closeSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.remove('open');
+                menuIcon.classList.remove('active');
+                this.isSidebarOpen = false;
+            }
+
+            navigateToSection(section) {
+                this.closeSidebar();
+                
+                switch(section) {
+                    case 'teams':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'tasks':
+                        // Уже на странице задач
+                        break;
+                    case 'schedule':
+                        window.location.href = 'schedule.html';
+                        break;
+                    case 'notes':
+                        window.location.href = 'notes.html';
+                        break;
+                    case 'meetings':
+                        // Пока не реализовано
+                        alert('Страница "Встречи" пока не реализована');
+                        break;
+                    case 'settings':
+                        // Пока не реализовано
+                        alert('Страница "Настройки" пока не реализована');
+                        break;
+                }
+            }
+        }
+
+        // Запускаем приложение после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new TasksManager();
+        });
+    </script>
+</body>
+</html>

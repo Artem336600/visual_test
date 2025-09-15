@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание - Deligate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            font-weight: 100;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000000;
+            border-bottom: 1px solid #ffffff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            opacity: 0.7;
+        }
+
+        .menu-line {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.active .menu-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-icon.active .menu-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.active .menu-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ffffff;
+        }
+
+        .icon:hover {
+            background: #ffffff;
+        }
+
+        .profile-icon {
+            border: none;
+        }
+
+        .profile-icon:hover {
+            background: transparent;
+        }
+
+        .notification-icon {
+            position: relative;
+        }
+
+        .notification-icon::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .notification-icon::after {
+            content: '3';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ffffff;
+            color: #000000;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 100;
+        }
+
+        .profile-icon::before {
+            content: 'АИ';
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #000000;
+            border-right: 1px solid #ffffff;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-item.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .main-content {
+            padding: 30px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .main-content.sidebar-open {
+            margin-left: 250px;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .calendar-container {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .current-month {
+            font-size: 1.2rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #ffffff;
+        }
+
+        .day-header {
+            background: #000000;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: 1px solid #ffffff;
+        }
+
+        .day-cell {
+            background: #000000;
+            border: 1px solid #ffffff;
+            min-height: 100px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .day-cell:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .day-cell.other-month {
+            opacity: 0.3;
+        }
+
+        .day-cell.today {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .day-number {
+            font-size: 0.9rem;
+            font-weight: 100;
+            margin-bottom: 5px;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .event-item {
+            background: #ffffff;
+            color: #000000;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            border-radius: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .add-event-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .add-event-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #000000;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.8) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-input {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #ffffff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .modal-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .notification-banner {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ffffff;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+
+        .notification-banner.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .notification-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notification-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .notification-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .notification-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .notification-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .add-event-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .calendar-container {
+                padding: 15px;
+            }
+            
+            .calendar-header {
+                margin-bottom: 15px;
+            }
+            
+            .current-month {
+                font-size: 1rem;
+            }
+            
+            .nav-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .calendar-grid {
+                font-size: 0.8rem;
+            }
+            
+            .day-header {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+            
+            .day-cell {
+                min-height: 80px;
+                padding: 6px;
+            }
+            
+            .day-number {
+                font-size: 0.8rem;
+                margin-bottom: 3px;
+            }
+            
+            .event-item {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+            }
+            
+            .notification-banner {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .notification-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .notification-item {
+                font-size: 0.8rem;
+                padding: 4px 0;
+            }
+            
+            .notification-actions {
+                margin-top: 8px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .notification-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            
+            .modal {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .modal-form {
+                gap: 12px;
+            }
+            
+            .modal-input {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            .content-title {
+                font-size: 1.3rem;
+            }
+            
+            .add-event-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            
+            .calendar-container {
+                padding: 10px;
+            }
+            
+            .calendar-header {
+                margin-bottom: 12px;
+            }
+            
+            .current-month {
+                font-size: 0.9rem;
+            }
+            
+            .nav-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .calendar-grid {
+                font-size: 0.7rem;
+            }
+            
+            .day-header {
+                padding: 6px;
+                font-size: 0.7rem;
+            }
+            
+            .day-cell {
+                min-height: 70px;
+                padding: 4px;
+            }
+            
+            .day-number {
+                font-size: 0.7rem;
+                margin-bottom: 2px;
+            }
+            
+            .event-item {
+                font-size: 0.55rem;
+                padding: 1px 3px;
+            }
+            
+            .notification-banner {
+                padding: 10px;
+                margin-bottom: 12px;
+            }
+            
+            .notification-title {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+            }
+            
+            .notification-item {
+                font-size: 0.75rem;
+                padding: 3px 0;
+            }
+            
+            .modal {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .modal-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .modal-form {
+                gap: 10px;
+            }
+            
+            .modal-input {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon" id="menuIcon">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+        <div class="logo">Deligate</div>
+        <div class="header-right">
+            <div class="icon notification-icon" id="notificationIcon"></div>
+            <div class="icon profile-icon" id="profileIcon"></div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <ul class="menu-items">
+            <li class="menu-item" data-section="teams">Команды</li>
+            <li class="menu-item" data-section="tasks">Задачи</li>
+            <li class="menu-item active" data-section="schedule">Расписание</li>
+            <li class="menu-item" data-section="notes">Заметки</li>
+            <li class="menu-item" data-section="meetings">Встречи</li>
+            <li class="menu-item" data-section="settings">Настройки</li>
+        </ul>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="main-content" id="mainContent">
+        <div class="content-title">
+            <span>Расписание</span>
+            <button class="add-event-btn" id="addEventBtn">+ Добавить событие</button>
+        </div>
+
+        <!-- Уведомление о незапланированных задачах -->
+        <div class="notification-banner" id="notificationBanner">
+            <div class="notification-title">Незапланированные задачи</div>
+            <ul class="notification-list" id="notificationList">
+            </ul>
+            <div class="notification-actions">
+                <button class="notification-btn primary" id="scheduleAllBtn">Запланировать все</button>
+                <button class="notification-btn" id="dismissNotificationBtn">Скрыть</button>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="nav-btn" id="prevMonthBtn">‹</button>
+                    <div class="current-month" id="currentMonth"></div>
+                    <button class="nav-btn" id="nextMonthBtn">›</button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Дни недели -->
+                <div class="day-header">Пн</div>
+                <div class="day-header">Вт</div>
+                <div class="day-header">Ср</div>
+                <div class="day-header">Чт</div>
+                <div class="day-header">Пт</div>
+                <div class="day-header">Сб</div>
+                <div class="day-header">Вс</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления события -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <div class="modal-title" id="eventModalTitle">Добавить событие</div>
+            <form class="modal-form" id="eventForm">
+                <input type="text" class="modal-input" id="eventTitleInput" placeholder="Название события" required>
+                <textarea class="modal-input" id="eventDescriptionInput" placeholder="Описание события" rows="3"></textarea>
+                <input type="date" class="modal-input" id="eventDateInput" required>
+                <div style="display: flex; gap: 10px;">
+                    <input type="time" class="modal-input" id="eventStartTimeInput" required>
+                    <input type="time" class="modal-input" id="eventEndTimeInput" required>
+                </div>
+                <select class="modal-input" id="eventRepeatInput">
+                    <option value="none">Не повторяется</option>
+                    <option value="daily">Ежедневно</option>
+                    <option value="weekly">Еженедельно</option>
+                    <option value="monthly">Ежемесячно</option>
+                </select>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" id="cancelEventBtn">Отмена</button>
+                    <button type="submit" class="modal-btn primary" id="saveEventBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class ScheduleManager {
+            constructor() {
+                this.currentDate = new Date();
+                this.events = this.loadEvents();
+                this.tasks = this.loadTasks();
+                this.isSidebarOpen = false;
+                this.selectedDate = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.setupSidebar();
+                this.setupCalendar();
+                this.setupEventListeners();
+                this.renderCalendar();
+                this.checkUnscheduledTasks();
+            }
+
+            setupSidebar() {
+                const menuIcon = document.getElementById('menuIcon');
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                const menuItems = document.querySelectorAll('.menu-item');
+
+                menuIcon.addEventListener('click', () => {
+                    this.toggleSidebar();
+                });
+
+                overlay.addEventListener('click', () => {
+                    this.closeSidebar();
+                });
+
+                menuItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const section = item.dataset.section;
+                        this.navigateToSection(section);
+                    });
+                });
+            }
+
+            toggleSidebar() {
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                const mainContent = document.getElementById('mainContent');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                mainContent.classList.add('sidebar-open');
+                menuIcon.classList.add('active');
+                this.isSidebarOpen = true;
+            }
+
+            closeSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                const mainContent = document.getElementById('mainContent');
+                const menuIcon = document.getElementById('menuIcon');
+
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                mainContent.classList.remove('sidebar-open');
+                menuIcon.classList.remove('active');
+                this.isSidebarOpen = false;
+            }
+
+            navigateToSection(section) {
+                this.closeSidebar();
+                
+                switch(section) {
+                    case 'teams':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'tasks':
+                        window.location.href = 'tasks.html';
+                        break;
+                    case 'schedule':
+                        // Уже на странице расписания
+                        break;
+                    case 'notes':
+                        window.location.href = 'notes.html';
+                        break;
+                    case 'meetings':
+                        window.location.href = 'meetings.html';
+                        break;
+                    case 'settings':
+                        // Пока не реализовано
+                        alert('Страница "Настройки" пока не реализована');
+                        break;
+                }
+            }
+
+            setupCalendar() {
+                const prevBtn = document.getElementById('prevMonthBtn');
+                const nextBtn = document.getElementById('nextMonthBtn');
+                const addEventBtn = document.getElementById('addEventBtn');
+
+                prevBtn.addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.renderCalendar();
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.renderCalendar();
+                });
+
+                addEventBtn.addEventListener('click', () => {
+                    this.showEventModal();
+                });
+            }
+
+            setupEventListeners() {
+                const eventModal = document.getElementById('eventModal');
+                const eventForm = document.getElementById('eventForm');
+                const cancelEventBtn = document.getElementById('cancelEventBtn');
+                const scheduleAllBtn = document.getElementById('scheduleAllBtn');
+                const dismissNotificationBtn = document.getElementById('dismissNotificationBtn');
+
+                eventForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveEvent();
+                });
+
+                cancelEventBtn.addEventListener('click', () => {
+                    this.hideEventModal();
+                });
+
+                eventModal.addEventListener('click', (e) => {
+                    if (e.target === eventModal) {
+                        this.hideEventModal();
+                    }
+                });
+
+                scheduleAllBtn.addEventListener('click', () => {
+                    this.scheduleAllTasks();
+                });
+
+                dismissNotificationBtn.addEventListener('click', () => {
+                    this.hideNotification();
+                });
+            }
+
+            renderCalendar() {
+                const calendarGrid = document.getElementById('calendarGrid');
+                const currentMonth = document.getElementById('currentMonth');
+                
+                // Обновляем заголовок месяца
+                const monthNames = [
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+                ];
+                currentMonth.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+
+                // Очищаем календарь (оставляем заголовки дней)
+                const dayHeaders = calendarGrid.querySelectorAll('.day-header');
+                calendarGrid.innerHTML = '';
+                dayHeaders.forEach(header => calendarGrid.appendChild(header));
+
+                // Получаем первый день месяца и количество дней
+                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+                const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
+
+                // Создаем ячейки календаря
+                for (let i = 0; i < 42; i++) {
+                    const cellDate = new Date(startDate);
+                    cellDate.setDate(startDate.getDate() + i);
+                    
+                    const dayCell = this.createDayCell(cellDate);
+                    calendarGrid.appendChild(dayCell);
+                }
+            }
+
+            createDayCell(date) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                
+                const isCurrentMonth = date.getMonth() === this.currentDate.getMonth();
+                const isToday = this.isToday(date);
+                
+                if (!isCurrentMonth) {
+                    cell.classList.add('other-month');
+                }
+                
+                if (isToday) {
+                    cell.classList.add('today');
+                }
+
+                cell.innerHTML = `
+                    <div class="day-number">${date.getDate()}</div>
+                    <div class="day-events" id="events-${this.formatDate(date)}"></div>
+                `;
+
+                // Добавляем события для этого дня
+                this.addEventsToCell(cell, date);
+
+                // Обработчик клика для добавления события
+                cell.addEventListener('click', () => {
+                    this.selectedDate = date;
+                    this.showEventModal(date);
+                });
+
+                return cell;
+            }
+
+            addEventsToCell(cell, date) {
+                const eventsContainer = cell.querySelector('.day-events');
+                const dateStr = this.formatDate(date);
+                const dayEvents = this.events.filter(event => event.date === dateStr);
+
+                dayEvents.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-item';
+                    eventElement.textContent = event.title;
+                    eventElement.title = `${event.title}\n${event.startTime} - ${event.endTime}\n${event.description || ''}`;
+                    
+                    eventElement.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.editEvent(event);
+                    });
+                    
+                    eventsContainer.appendChild(eventElement);
+                });
+            }
+
+            showEventModal(date = null) {
+                const modal = document.getElementById('eventModal');
+                const title = document.getElementById('eventModalTitle');
+                const form = document.getElementById('eventForm');
+                const dateInput = document.getElementById('eventDateInput');
+
+                if (date) {
+                    title.textContent = 'Добавить событие';
+                    dateInput.value = this.formatDate(date);
+                } else {
+                    title.textContent = 'Добавить событие';
+                    dateInput.value = this.formatDate(new Date());
+                }
+
+                // Устанавливаем время по умолчанию
+                document.getElementById('eventStartTimeInput').value = '09:00';
+                document.getElementById('eventEndTimeInput').value = '10:00';
+
+                modal.classList.add('active');
+            }
+
+            hideEventModal() {
+                const modal = document.getElementById('eventModal');
+                modal.classList.remove('active');
+                document.getElementById('eventForm').reset();
+            }
+
+            saveEvent() {
+                const title = document.getElementById('eventTitleInput').value.trim();
+                const description = document.getElementById('eventDescriptionInput').value.trim();
+                const date = document.getElementById('eventDateInput').value;
+                const startTime = document.getElementById('eventStartTimeInput').value;
+                const endTime = document.getElementById('eventEndTimeInput').value;
+                const repeat = document.getElementById('eventRepeatInput').value;
+
+                if (!title || !date || !startTime || !endTime) {
+                    alert('Пожалуйста, заполните все обязательные поля');
+                    return;
+                }
+
+                const newEvent = {
+                    id: Date.now().toString(),
+                    title,
+                    description,
+                    date,
+                    startTime,
+                    endTime,
+                    repeat
+                };
+
+                this.events.push(newEvent);
+                this.saveEvents();
+                this.renderCalendar();
+                this.hideEventModal();
+            }
+
+            editEvent(event) {
+                // Простая реализация редактирования
+                if (confirm(`Удалить событие "${event.title}"?`)) {
+                    this.events = this.events.filter(e => e.id !== event.id);
+                    this.saveEvents();
+                    this.renderCalendar();
+                }
+            }
+
+            loadEvents() {
+                const saved = localStorage.getItem('schedule_events');
+                return saved ? JSON.parse(saved) : [];
+            }
+
+            saveEvents() {
+                localStorage.setItem('schedule_events', JSON.stringify(this.events));
+            }
+
+            loadTasks() {
+                // Загружаем задачи из localStorage (симуляция данных из канбан-доски)
+                const saved = localStorage.getItem('kanban_tasks');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+
+                // Mock-данные для демонстрации
+                return {
+                    '1': [
+                        { id: '1-1', title: 'Создать компонент навигации', deadline: '2024-01-15', status: 'todo' },
+                        { id: '1-2', title: 'Настроить роутинг', deadline: '2024-01-20', status: 'inprocess' },
+                        { id: '1-3', title: 'Добавить аутентификацию', deadline: '2024-01-25', status: 'testing' }
+                    ],
+                    '2': [
+                        { id: '2-1', title: 'Создать REST endpoints', deadline: '2024-01-18', status: 'todo' },
+                        { id: '2-2', title: 'Добавить валидацию', deadline: '2024-01-22', status: 'inprocess' }
+                    ]
+                };
+            }
+
+            checkUnscheduledTasks() {
+                const unscheduledTasks = this.getUnscheduledTasks();
+                
+                if (unscheduledTasks.length > 0) {
+                    this.showNotification(unscheduledTasks);
+                }
+            }
+
+            getUnscheduledTasks() {
+                const unscheduled = [];
+                const today = new Date();
+                
+                Object.values(this.tasks).forEach(teamTasks => {
+                    teamTasks.forEach(task => {
+                        if (task.status !== 'done') {
+                            const taskDate = new Date(task.deadline);
+                            const isScheduled = this.events.some(event => 
+                                event.title.includes(task.title) || 
+                                event.description?.includes(task.title)
+                            );
+                            
+                            if (!isScheduled && taskDate >= today) {
+                                unscheduled.push(task);
+                            }
+                        }
+                    });
+                });
+                
+                return unscheduled;
+            }
+
+            showNotification(tasks) {
+                const banner = document.getElementById('notificationBanner');
+                const list = document.getElementById('notificationList');
+                
+                list.innerHTML = '';
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = 'notification-item';
+                    li.textContent = `${task.title} (до ${new Date(task.deadline).toLocaleDateString('ru-RU')})`;
+                    list.appendChild(li);
+                });
+                
+                banner.classList.add('show');
+            }
+
+            hideNotification() {
+                const banner = document.getElementById('notificationBanner');
+                banner.classList.remove('show');
+            }
+
+            scheduleAllTasks() {
+                const unscheduledTasks = this.getUnscheduledTasks();
+                
+                unscheduledTasks.forEach(task => {
+                    const event = {
+                        id: Date.now().toString() + Math.random(),
+                        title: task.title,
+                        description: 'Запланированная задача',
+                        date: task.deadline,
+                        startTime: '09:00',
+                        endTime: '10:00',
+                        repeat: 'none'
+                    };
+                    
+                    this.events.push(event);
+                });
+                
+                this.saveEvents();
+                this.renderCalendar();
+                this.hideNotification();
+                
+                alert(`Запланировано ${unscheduledTasks.length} задач`);
+            }
+
+            formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+            isToday(date) {
+                const today = new Date();
+                return date.toDateString() === today.toDateString();
+            }
+        }
+
+        // Запускаем приложение после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new ScheduleManager();
+        });
+    </script>
+</body>
+</html>

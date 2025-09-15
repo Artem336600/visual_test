@@ -1,0 +1,2785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deligate - Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 100;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000000;
+            border-bottom: 1px solid #ffffff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            opacity: 0.7;
+        }
+
+        .menu-line {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.active .menu-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-icon.active .menu-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.active .menu-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ffffff;
+        }
+
+        .icon:hover {
+            background: #ffffff;
+        }
+
+        .profile-icon {
+            border: none;
+        }
+
+        .profile-icon:hover {
+            background: transparent;
+        }
+
+        .notification-icon {
+            position: relative;
+        }
+
+        .notification-icon::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .notification-icon::after {
+            content: '3';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ffffff;
+            color: #000000;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 100;
+        }
+
+        .profile-icon::before {
+            content: 'АИ';
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            border: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: #000000;
+            border-right: 1px solid #ffffff;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-item.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .main-content {
+            padding: 30px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .main-content.sidebar-open {
+            margin-left: 250px;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .create-team-btn {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .create-team-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .team-card {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .team-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .team-card.selected {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 5px;
+        }
+
+        .team-role {
+            font-size: 0.8rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .team-notifications {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ffffff;
+            color: #000000;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 100;
+        }
+
+        .team-card.selected .team-notifications {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .team-card.selected .team-role {
+            opacity: 0.5;
+        }
+
+
+        .team-info-panel {
+            position: fixed;
+            bottom: -40vh;
+            left: 0;
+            right: 0;
+            height: 40vh;
+            background: #000000;
+            border-top: 1px solid #ffffff;
+            transition: bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .team-info-panel.visible {
+            bottom: 0;
+        }
+
+        .team-info-content {
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-info-header {
+            margin-bottom: 20px;
+        }
+
+        .team-info-title {
+            font-size: 1.5rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .team-info-description {
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .team-info-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .projects-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .project-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .project-item:last-child {
+            border-bottom: none;
+        }
+
+        .invite-link-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .invite-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .invite-link {
+            flex: 1;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            font-weight: 100;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 16px;
+            font-family: inherit;
+            font-weight: 100;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .regenerate-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 16px;
+            font-family: inherit;
+            font-weight: 100;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .regenerate-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .members-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .member-role {
+            font-size: 0.8rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .member-item {
+            cursor: pointer;
+        }
+
+        .member-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .project-item {
+            cursor: pointer;
+        }
+
+        .project-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000;
+            border-top: 1px solid #ffffff;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .detail-panel.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-weight: 100;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .detail-title {
+            font-size: 1.3rem;
+            font-weight: 100;
+            letter-spacing: 0.1em;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+        }
+
+        .detail-section-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .detail-info {
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-list-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-name {
+            flex: 1;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .task-responsible {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-left: 15px;
+        }
+
+        .remove-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: 100;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .remove-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .dissolve-btn {
+            background: transparent;
+            color: #ff4444;
+            border: 1px solid #ff4444;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            margin-top: 20px;
+        }
+
+        .dissolve-btn:hover {
+            background: #ff4444;
+            color: #ffffff;
+        }
+
+        .leave-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            margin-top: 20px;
+        }
+
+        .leave-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #000000;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.8) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-input {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #ffffff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-buttons.vertical {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .modal-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .modal-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .main-content.with-panel {
+            height: calc(60vh - 60px);
+        }
+
+        /* Стили для страницы задач */
+        .tasks-page {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+            background: #000000;
+        }
+
+        .tasks-page.active {
+            display: block;
+        }
+
+        .team-selector {
+            margin-bottom: 30px;
+        }
+
+        .team-selector select {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 15px;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            min-width: 200px;
+        }
+
+        .team-selector select:focus {
+            outline: none;
+        }
+
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .kanban-column {
+            min-width: 250px;
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 15px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .column-title {
+            font-size: 1rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+        }
+
+        .add-task-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-task-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-card {
+            background: transparent;
+            border: 1px solid #ffffff;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .task-title {
+            font-size: 0.9rem;
+            font-weight: 100;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .task-responsible {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .task-deadline {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .task-description {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .column-content {
+            min-height: 200px;
+        }
+
+        .column-content.drag-over {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed #ffffff;
+        }
+
+        /* Модальное окно для создания/редактирования задач */
+        .task-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .task-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .task-modal-content {
+            background: #000000;
+            border: 1px solid #ffffff;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.8) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .task-modal.active .task-modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .task-modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-form input,
+        .task-form textarea,
+        .task-form select {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .task-form input:focus,
+        .task-form textarea:focus,
+        .task-form select:focus {
+            outline: none;
+            border-color: #ffffff;
+        }
+
+        .task-form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .task-form-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .task-form-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-form-btn.primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .task-form-btn.primary:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .team-info-panel {
+                height: 50vh;
+                bottom: -50vh;
+            }
+
+            .main-content.with-panel {
+                height: calc(50vh - 60px);
+            }
+
+            .invite-link-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+
+            .invite-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .regenerate-btn {
+                width: 100%;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+            
+            .teams-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .team-card {
+                padding: 15px;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .create-team-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .team-info-panel {
+                height: 60vh;
+                bottom: -60vh;
+            }
+            
+            .main-content.with-panel {
+                height: calc(40vh - 60px);
+            }
+            
+            .team-info-content {
+                padding: 20px;
+            }
+            
+            .invite-link-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .invite-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .copy-btn, .regenerate-btn {
+                width: 100%;
+            }
+            
+            .modal {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .modal-buttons.vertical {
+                gap: 10px;
+            }
+            
+            .kanban-board {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .kanban-column {
+                min-width: auto;
+            }
+            
+            .task-modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .content-title {
+                font-size: 1.3rem;
+            }
+            
+            .teams-grid {
+                gap: 10px;
+            }
+            
+            .team-card {
+                padding: 12px;
+            }
+            
+            .team-name {
+                font-size: 1rem;
+            }
+            
+            .team-role {
+                font-size: 0.75rem;
+            }
+            
+            .team-info-panel {
+                height: 70vh;
+                bottom: -70vh;
+            }
+            
+            .main-content.with-panel {
+                height: calc(30vh - 60px);
+            }
+            
+            .modal {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .task-modal-content {
+                padding: 15px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="menu-icon" id="menuIcon">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+        <div class="logo">Deligate</div>
+        <div class="header-right">
+            <div class="icon notification-icon" id="notificationIcon"></div>
+            <div class="icon profile-icon" id="profileIcon"></div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <ul class="menu-items">
+            <li class="menu-item active" data-section="teams">Команды</li>
+            <li class="menu-item" data-section="tasks">Задачи</li>
+            <li class="menu-item" data-section="schedule">Расписание</li>
+            <li class="menu-item" data-section="notes">Заметки</li>
+            <li class="menu-item" data-section="meetings">Встречи</li>
+            <li class="menu-item" data-section="settings">Настройки</li>
+        </ul>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="main-content" id="mainContent">
+        <div class="content-title">
+            <span>Команды</span>
+            <button class="create-team-btn" id="createTeamBtn">+</button>
+        </div>
+        <div class="teams-grid" id="teamsGrid">
+            <div class="team-card selected" data-team="1">
+                <div class="team-notifications">5</div>
+                <div class="team-name">Frontend Team</div>
+                <div class="team-role">Участник</div>
+            </div>
+            <div class="team-card" data-team="2">
+                <div class="team-notifications">2</div>
+                <div class="team-name">Backend Team</div>
+                <div class="team-role">Админ</div>
+            </div>
+            <div class="team-card" data-team="3">
+                <div class="team-notifications">8</div>
+                <div class="team-name">Design Team</div>
+                <div class="team-role">Участник</div>
+            </div>
+            <div class="team-card" data-team="4">
+                <div class="team-notifications">1</div>
+                <div class="team-name">QA Team</div>
+                <div class="team-role">Создатель</div>
+            </div>
+            <div class="team-card" data-team="5">
+                <div class="team-notifications">3</div>
+                <div class="team-name">DevOps Team</div>
+                <div class="team-role">Участник</div>
+            </div>
+            <div class="team-card" data-team="6">
+                <div class="team-notifications">0</div>
+                <div class="team-name">Marketing Team</div>
+                <div class="team-role">Участник</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-info-panel" id="teamInfoPanel">
+        <div class="team-info-content">
+            <div class="team-info-header">
+                <div class="team-info-title" id="teamInfoTitle">Frontend Team</div>
+                <div class="team-info-description" id="teamInfoDescription">Команда разработки фронтенда</div>
+            </div>
+            
+            <div class="team-info-section">
+                <div class="section-title">Проекты</div>
+                <ul class="projects-list" id="projectsList">
+                    <li class="project-item">React Dashboard</li>
+                    <li class="project-item">Mobile App</li>
+                    <li class="project-item">API Integration</li>
+                </ul>
+            </div>
+            
+            <div class="team-info-section">
+                <div class="section-title">Участники</div>
+                <ul class="members-list" id="membersList">
+                    <li class="member-item">
+                        <div class="member-avatar">АИ</div>
+                        <div class="member-info">
+                            <div class="member-name">Алексей Иванов</div>
+                            <div class="member-role">Админ</div>
+                        </div>
+                    </li>
+                    <li class="member-item">
+                        <div class="member-avatar">МП</div>
+                        <div class="member-info">
+                            <div class="member-name">Мария Петрова</div>
+                            <div class="member-role">Участник</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="team-info-section" id="inviteSection">
+                <div class="section-title">Пригласительная ссылка</div>
+                <div class="invite-link-container">
+                    <input type="text" class="invite-link" id="inviteLink" value="https://deligate.app/join/frontend-team-abc123" readonly>
+                    <div class="invite-buttons">
+                        <button class="regenerate-btn" id="regenerateBtn">Перегенерировать</button>
+                        <button class="copy-btn" id="copyBtn">Скопировать ссылку</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="dissolve-btn" id="dissolveTeamBtn" style="display: none;">Расформировать команду</button>
+            <button class="leave-btn" id="leaveTeamBtn" style="display: none;">Покинуть команду</button>
+        </div>
+
+        <!-- Детальная панель участника -->
+        <div class="detail-panel" id="memberDetailPanel">
+            <div class="team-info-content">
+                <div class="detail-header">
+                    <button class="back-btn" id="memberBackBtn">← Назад</button>
+                    <div class="detail-title" id="memberDetailTitle">Алексей Иванов</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Телеграм</div>
+                    <div class="detail-info" id="memberTelegram">@alexey_ivanov</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Общие команды</div>
+                    <ul class="detail-list" id="commonTeamsList">
+                        <li class="detail-list-item">Frontend Team</li>
+                        <li class="detail-list-item">Backend Team</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Задачи</div>
+                    <ul class="detail-list" id="memberTasksList">
+                        <li class="detail-list-item">React Dashboard - Создать компонент навигации</li>
+                        <li class="detail-list-item">Mobile App - Настроить роутинг</li>
+                    </ul>
+                </div>
+                
+                <button class="remove-btn" id="removeMemberBtn" style="display: none;">Удалить из команды</button>
+            </div>
+        </div>
+
+        <!-- Детальная панель проекта -->
+        <div class="detail-panel" id="projectDetailPanel">
+            <div class="team-info-content">
+                <div class="detail-header">
+                    <button class="back-btn" id="projectBackBtn">← Назад</button>
+                    <div class="detail-title" id="projectDetailTitle">React Dashboard</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Описание</div>
+                    <div class="detail-info" id="projectDescription">Веб-приложение для управления проектами с современным интерфейсом на React</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Задачи проекта</div>
+                    <ul class="detail-list" id="projectTasksList">
+                        <li class="detail-list-item">Создать компонент навигации</li>
+                        <li class="detail-list-item">Настроить роутинг</li>
+                        <li class="detail-list-item">Добавить аутентификацию</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Страница задач -->
+    <div class="tasks-page" id="tasksPage">
+        <div class="team-selector">
+            <select id="teamSelector">
+                <option value="">Выберите команду</option>
+            </select>
+        </div>
+        
+        <div class="kanban-board" id="kanbanBoard">
+            <div class="kanban-column" data-status="todo">
+                <div class="column-header">
+                    <div class="column-title">ToDo</div>
+                    <button class="add-task-btn" id="addTaskBtn">+</button>
+                </div>
+                <div class="column-content" id="todoColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="inprocess">
+                <div class="column-header">
+                    <div class="column-title">InProcess</div>
+                </div>
+                <div class="column-content" id="inprocessColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="testing">
+                <div class="column-header">
+                    <div class="column-title">Testing</div>
+                </div>
+                <div class="column-content" id="testingColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="remake">
+                <div class="column-header">
+                    <div class="column-title">Remake</div>
+                </div>
+                <div class="column-content" id="remakeColumn"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="done">
+                <div class="column-header">
+                    <div class="column-title">Done</div>
+                </div>
+                <div class="column-content" id="doneColumn"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для задач -->
+    <div class="task-modal" id="taskModal">
+        <div class="task-modal-content">
+            <div class="task-modal-title" id="taskModalTitle">Создать задачу</div>
+            <form class="task-form" id="taskForm">
+                <input type="text" id="taskTitleInput" placeholder="Название задачи" required>
+                <textarea id="taskDescriptionInput" placeholder="Описание задачи" rows="3"></textarea>
+                <select id="taskResponsibleInput" required>
+                    <option value="">Выберите ответственного</option>
+                </select>
+                <input type="date" id="taskDeadlineInput" required>
+                <div class="task-form-buttons">
+                    <button type="button" class="task-form-btn" id="cancelTaskBtn">Отмена</button>
+                    <button type="submit" class="task-form-btn primary" id="saveTaskBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора действия -->
+    <div class="modal-overlay" id="teamActionModal">
+        <div class="modal">
+            <div class="modal-title">Добавить команду</div>
+            <div class="modal-buttons vertical">
+                <button type="button" class="modal-btn" id="joinTeamBtn">Присоединиться к команде</button>
+                <button type="button" class="modal-btn primary" id="createNewTeamBtn">Создать новую команду</button>
+                <button type="button" class="modal-btn" id="cancelActionBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно присоединения к команде -->
+    <div class="modal-overlay" id="joinTeamModal">
+        <div class="modal">
+            <div class="modal-title">Присоединиться к команде</div>
+            <form class="modal-form" id="joinTeamForm">
+                <input type="text" class="modal-input" id="inviteLinkInput" placeholder="Введите ссылку-приглашение" required>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" id="cancelJoinBtn">Отмена</button>
+                    <button type="submit" class="modal-btn primary" id="joinTeamSubmitBtn">Присоединиться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания команды -->
+    <div class="modal-overlay" id="createTeamModal">
+        <div class="modal">
+            <div class="modal-title">Создать новую команду</div>
+            <form class="modal-form" id="createTeamForm">
+                <input type="text" class="modal-input" id="teamNameInput" placeholder="Название команды" required>
+                <textarea class="modal-input" id="teamDescriptionInput" placeholder="Описание команды" rows="3"></textarea>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" id="cancelCreateBtn">Отмена</button>
+                    <button type="submit" class="modal-btn primary" id="createTeamSubmitBtn">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class Dashboard {
+            constructor() {
+                this.menuIcon = document.getElementById('menuIcon');
+                this.sidebar = document.getElementById('sidebar');
+                this.overlay = document.getElementById('overlay');
+                this.mainContent = document.getElementById('mainContent');
+                this.menuItems = document.querySelectorAll('.menu-item');
+                this.teamCards = document.querySelectorAll('.team-card');
+                this.isSidebarOpen = false;
+                this.teamInfoPanel = document.getElementById('teamInfoPanel');
+                this.mainContent = document.getElementById('mainContent');
+                this.selectedTeam = null;
+                this.currentUser = 'Алексей Иванов'; // Текущий пользователь
+                this.memberDetailPanel = document.getElementById('memberDetailPanel');
+                this.projectDetailPanel = document.getElementById('projectDetailPanel');
+                this.teamActionModal = document.getElementById('teamActionModal');
+                this.joinTeamModal = document.getElementById('joinTeamModal');
+                this.createTeamModal = document.getElementById('createTeamModal');
+                this.joinTeamForm = document.getElementById('joinTeamForm');
+                this.createTeamForm = document.getElementById('createTeamForm');
+                this.dissolveTeamBtn = document.getElementById('dissolveTeamBtn');
+                this.leaveTeamBtn = document.getElementById('leaveTeamBtn');
+                this.nextTeamId = 6; // Следующий ID для новой команды
+                
+                // Инициализируем mock-данные
+                this.teams = {
+                    '1': {
+                        name: 'Frontend Team',
+                        description: 'Команда разработки фронтенда',
+                        projects: ['React Dashboard', 'Mobile App', 'API Integration'],
+                        members: ['Алексей Иванов', 'Мария Петрова', 'Дмитрий Сидоров'],
+                        inviteToken: 'frontend-team-abc123'
+                    },
+                    '2': {
+                        name: 'Backend Team',
+                        description: 'Команда разработки бэкенда',
+                        projects: ['Backend API', 'Database Design', 'Microservices'],
+                        members: ['Иван Козлов', 'Елена Морозова', 'Анна Лебедева'],
+                        inviteToken: 'backend-team-def456'
+                    },
+                    '3': {
+                        name: 'Design Team',
+                        description: 'Команда дизайна и UX',
+                        projects: ['UI/UX Design', 'Brand Identity', 'Prototyping'],
+                        members: ['Ольга Новикова', 'Павел Соколов'],
+                        inviteToken: 'design-team-ghi789'
+                    },
+                    '4': {
+                        name: 'QA Team',
+                        description: 'Команда тестирования',
+                        projects: ['Test Automation', 'Manual Testing', 'Performance Testing'],
+                        members: ['Татьяна Попова', 'Андрей Федоров', 'Наталья Медведева'],
+                        inviteToken: 'qa-team-jkl012'
+                    },
+                    '5': {
+                        name: 'DevOps Team',
+                        description: 'Команда инфраструктуры',
+                        projects: ['CI/CD Pipeline', 'Infrastructure', 'Monitoring'],
+                        members: ['Владимир Орлов', 'Светлана Зайцева'],
+                        inviteToken: 'devops-team-mno345'
+                    },
+                    '6': {
+                        name: 'Marketing Team',
+                        description: 'Команда маркетинга',
+                        projects: ['Marketing Campaign', 'Social Media', 'Analytics'],
+                        members: ['Роман Смирнов', 'Юлия Кузнецова', 'Михаил Васильев'],
+                        inviteToken: 'marketing-team-pqr678'
+                    }
+                };
+                
+                this.userRoles = {
+                    '1': 'Участник',
+                    '2': 'Админ',
+                    '3': 'Участник',
+                    '4': 'Участник',
+                    '5': 'Участник',
+                    '6': 'Участник'
+                };
+                
+                // Mock-данные для задач
+                this.tasks = {
+                    '1': [
+                        { id: '1-1', title: 'Создать компонент навигации', description: 'Разработать основной компонент навигации для приложения', responsible: 'Алексей Иванов', deadline: '2024-01-15', status: 'todo' },
+                        { id: '1-2', title: 'Настроить роутинг', description: 'Настроить маршрутизацию между страницами', responsible: 'Мария Петрова', deadline: '2024-01-20', status: 'inprocess' },
+                        { id: '1-3', title: 'Добавить аутентификацию', description: 'Реализовать систему входа и регистрации', responsible: 'Дмитрий Сидоров', deadline: '2024-01-25', status: 'testing' },
+                        { id: '1-4', title: 'Создать дашборд', description: 'Разработать главную страницу приложения', responsible: 'Алексей Иванов', deadline: '2024-01-30', status: 'done' }
+                    ],
+                    '2': [
+                        { id: '2-1', title: 'Создать REST endpoints', description: 'Разработать API endpoints для основных функций', responsible: 'Иван Козлов', deadline: '2024-01-18', status: 'todo' },
+                        { id: '2-2', title: 'Добавить валидацию', description: 'Реализовать валидацию входных данных', responsible: 'Елена Морозова', deadline: '2024-01-22', status: 'inprocess' },
+                        { id: '2-3', title: 'Добавить тесты', description: 'Написать unit и integration тесты', responsible: 'Анна Лебедева', deadline: '2024-01-28', status: 'testing' }
+                    ],
+                    '3': [
+                        { id: '3-1', title: 'Создать макеты', description: 'Разработать дизайн-макеты для всех страниц', responsible: 'Ольга Новикова', deadline: '2024-01-16', status: 'todo' },
+                        { id: '3-2', title: 'Разработать прототипы', description: 'Создать интерактивные прототипы', responsible: 'Павел Соколов', deadline: '2024-01-24', status: 'inprocess' }
+                    ],
+                    '4': [
+                        { id: '4-1', title: 'Настроить Selenium', description: 'Настроить автоматизированное тестирование', responsible: 'Татьяна Попова', deadline: '2024-01-19', status: 'todo' },
+                        { id: '4-2', title: 'Создать тесты API', description: 'Написать тесты для API endpoints', responsible: 'Андрей Федоров', deadline: '2024-01-26', status: 'inprocess' }
+                    ],
+                    '5': [
+                        { id: '5-1', title: 'Настроить Jenkins', description: 'Настроить CI/CD pipeline', responsible: 'Владимир Орлов', deadline: '2024-01-17', status: 'todo' },
+                        { id: '5-2', title: 'Создать pipeline', description: 'Создать pipeline для автоматического деплоя', responsible: 'Светлана Зайцева', deadline: '2024-01-23', status: 'inprocess' }
+                    ],
+                    '6': [
+                        { id: '6-1', title: 'Разработать стратегию', description: 'Создать маркетинговую стратегию', responsible: 'Роман Смирнов', deadline: '2024-01-21', status: 'todo' },
+                        { id: '6-2', title: 'Создать контент', description: 'Подготовить контент для кампании', responsible: 'Юлия Кузнецова', deadline: '2024-01-27', status: 'inprocess' }
+                    ]
+                };
+                
+                this.currentTaskId = 100; // Счетчик для новых задач
+                this.selectedTeamForTasks = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.menuIcon.addEventListener('click', () => {
+                    this.toggleSidebar();
+                });
+
+                this.overlay.addEventListener('click', () => {
+                    this.closeSidebar();
+                });
+
+                this.menuItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.selectMenuItem(item);
+                    });
+                });
+
+                this.teamCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        this.selectTeam(card);
+                    });
+                });
+
+
+                // Добавляем обработчик для кнопки копирования ссылки
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.addEventListener('click', () => {
+                    this.copyInviteLink();
+                });
+
+                // Добавляем обработчик для кнопки перегенерации ссылки
+                const regenerateBtn = document.getElementById('regenerateBtn');
+                regenerateBtn.addEventListener('click', () => {
+                    this.regenerateInviteLink();
+                });
+
+                // Добавляем обработчики для детальных панелей
+                this.addDetailPanelListeners();
+                this.addTeamActionListeners();
+                this.addJoinTeamListeners();
+                this.addCreateTeamListeners();
+                this.addDissolveTeamListeners();
+                this.addLeaveTeamListeners();
+                this.addTasksPageListeners();
+
+                // Закрытие меню при клике вне его
+                document.addEventListener('click', (e) => {
+                    if (this.isSidebarOpen && !this.sidebar.contains(e.target) && !this.menuIcon.contains(e.target)) {
+                        this.closeSidebar();
+                    }
+                });
+            }
+
+            toggleSidebar() {
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                this.sidebar.classList.add('open');
+                this.overlay.classList.add('active');
+                this.mainContent.classList.add('sidebar-open');
+                this.menuIcon.classList.add('active');
+                this.isSidebarOpen = true;
+            }
+
+            closeSidebar() {
+                this.sidebar.classList.remove('open');
+                this.overlay.classList.remove('active');
+                this.mainContent.classList.remove('sidebar-open');
+                this.menuIcon.classList.remove('active');
+                this.isSidebarOpen = false;
+            }
+
+            selectMenuItem(selectedItem) {
+                this.menuItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                selectedItem.classList.add('active');
+                
+                // Обновляем контент в зависимости от выбранного пункта
+                const section = selectedItem.dataset.section;
+                this.updateContent(section);
+                
+                // Закрываем меню на мобильных устройствах
+                if (window.innerWidth <= 768) {
+                    this.closeSidebar();
+                }
+            }
+
+            updateContent(section) {
+                const contentTitle = document.querySelector('.content-title');
+                const teamsGrid = document.getElementById('teamsGrid');
+                
+                switch(section) {
+                    case 'teams':
+                        contentTitle.textContent = 'Команды';
+                        teamsGrid.style.display = 'grid';
+                        this.hideTasksPage();
+                        break;
+                    case 'schedule':
+                        window.location.href = 'schedule.html';
+                        break;
+                    case 'tasks':
+                        window.location.href = 'tasks.html';
+                        break;
+                    case 'notes':
+                        window.location.href = 'notes.html';
+                        break;
+                    case 'meetings':
+                        window.location.href = 'meetings.html';
+                        break;
+                    case 'settings':
+                        contentTitle.textContent = 'Настройки';
+                        teamsGrid.style.display = 'none';
+                        this.hideTasksPage();
+                        break;
+                }
+            }
+
+            selectTeam(selectedCard) {
+                // Если кликнули на уже выбранную команду, скрываем панель
+                if (this.selectedTeam === selectedCard) {
+                    this.hideTeamInfoPanel();
+                    this.selectedTeam = null;
+                    return;
+                }
+
+                this.teamCards.forEach(card => {
+                    card.classList.remove('selected');
+                });
+                selectedCard.classList.add('selected');
+                this.selectedTeam = selectedCard;
+
+                // Обновляем информацию о команде
+                this.updateTeamInfo(selectedCard);
+                this.showTeamInfoPanel();
+            }
+
+            updateTeamInfo(teamCard) {
+                const teamName = teamCard.querySelector('.team-name').textContent;
+                const teamId = teamCard.dataset.team;
+                const team = this.teams[teamId];
+                
+                // Обновляем заголовок и описание
+                document.getElementById('teamInfoTitle').textContent = teamName;
+                document.getElementById('teamInfoDescription').textContent = team.description;
+                
+                // Обновляем ссылку
+                const inviteLink = document.getElementById('inviteLink');
+                inviteLink.value = `https://deligate.app/join/${teamName.toLowerCase().replace(/\s+/g, '-')}-${teamId}`;
+                
+                // Обновляем список проектов
+                this.updateProjectsList(teamId);
+                
+                // Обновляем список участников
+                this.updateMembersList(teamId);
+                
+                // Проверяем права доступа к пригласительной ссылке
+                this.updateInviteSectionVisibility(teamId);
+                this.updateDissolveButtonVisibility(teamId);
+            }
+
+            updateProjectsList(teamId) {
+                const projectsList = document.getElementById('projectsList');
+                const projects = this.getTeamProjects(teamId);
+                
+                projectsList.innerHTML = '';
+                projects.forEach((project, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'project-item';
+                    li.textContent = project;
+                    li.dataset.projectIndex = index;
+                    
+                    // Добавляем обработчик клика
+                    li.addEventListener('click', () => {
+                        this.showProjectDetail(teamId, index);
+                    });
+                    
+                    projectsList.appendChild(li);
+                });
+            }
+
+            getTeamProjects(teamId) {
+                const projects = {
+                    '1': ['React Dashboard', 'Mobile App', 'API Integration'],
+                    '2': ['Backend API', 'Database Design', 'Microservices'],
+                    '3': ['UI/UX Design', 'Brand Identity', 'Prototyping'],
+                    '4': ['Test Automation', 'Manual Testing', 'Performance Testing'],
+                    '5': ['CI/CD Pipeline', 'Infrastructure', 'Monitoring'],
+                    '6': ['Marketing Campaign', 'Social Media', 'Analytics']
+                };
+                return projects[teamId] || ['Нет проектов'];
+            }
+
+            updateMembersList(teamId) {
+                const membersList = document.getElementById('membersList');
+                const members = this.getTeamMembers(teamId);
+                
+                membersList.innerHTML = '';
+                members.forEach((member, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'member-item';
+                    li.dataset.memberIndex = index;
+                    
+                    const initials = this.getInitials(member.name);
+                    
+                    li.innerHTML = `
+                        <div class="member-avatar">${initials}</div>
+                        <div class="member-info">
+                            <div class="member-name">${member.name}</div>
+                            <div class="member-role">${member.role}</div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчик клика
+                    li.addEventListener('click', () => {
+                        this.showMemberDetail(teamId, index);
+                    });
+                    
+                    membersList.appendChild(li);
+                });
+            }
+
+            getTeamMembers(teamId) {
+                const members = {
+                    '1': [
+                        { name: 'Алексей Иванов', role: 'Админ' },
+                        { name: 'Мария Петрова', role: 'Участник' },
+                        { name: 'Дмитрий Сидоров', role: 'Участник' }
+                    ],
+                    '2': [
+                        { name: 'Иван Козлов', role: 'Админ' },
+                        { name: 'Елена Морозова', role: 'Участник' },
+                        { name: 'Сергей Волков', role: 'Участник' },
+                        { name: 'Анна Лебедева', role: 'Участник' }
+                    ],
+                    '3': [
+                        { name: 'Ольга Новикова', role: 'Админ' },
+                        { name: 'Павел Соколов', role: 'Участник' }
+                    ],
+                    '4': [
+                        { name: 'Татьяна Попова', role: 'Админ' },
+                        { name: 'Андрей Федоров', role: 'Участник' },
+                        { name: 'Наталья Медведева', role: 'Участник' }
+                    ],
+                    '5': [
+                        { name: 'Владимир Орлов', role: 'Админ' },
+                        { name: 'Светлана Зайцева', role: 'Участник' }
+                    ],
+                    '6': [
+                        { name: 'Роман Смирнов', role: 'Админ' },
+                        { name: 'Юлия Кузнецова', role: 'Участник' },
+                        { name: 'Михаил Васильев', role: 'Участник' }
+                    ]
+                };
+                return members[teamId] || [{ name: 'Нет участников', role: '' }];
+            }
+
+            getInitials(name) {
+                return name.split(' ')
+                    .map(word => word.charAt(0).toUpperCase())
+                    .join('')
+                    .substring(0, 2);
+            }
+
+            getUserRoleInTeam(teamId) {
+                const userRoles = {
+                    '1': 'Участник',
+                    '2': 'Админ', 
+                    '3': 'Участник',
+                    '4': 'Создатель',
+                    '5': 'Участник',
+                    '6': 'Участник'
+                };
+                return userRoles[teamId] || 'Участник';
+            }
+
+            updateInviteSectionVisibility(teamId) {
+                const inviteSection = document.getElementById('inviteSection');
+                const userRole = this.getUserRoleInTeam(teamId);
+                
+                // Показываем пригласительную ссылку только для админов и создателей
+                if (userRole === 'Админ' || userRole === 'Создатель') {
+                    inviteSection.style.display = 'block';
+                } else {
+                    inviteSection.style.display = 'none';
+                }
+            }
+
+            showTeamInfoPanel() {
+                this.teamInfoPanel.classList.add('visible');
+                this.mainContent.classList.add('with-panel');
+            }
+
+            hideTeamInfoPanel() {
+                this.teamInfoPanel.classList.remove('visible');
+                this.mainContent.classList.remove('with-panel');
+            }
+
+            copyInviteLink() {
+                const inviteLink = document.getElementById('inviteLink');
+                inviteLink.select();
+                inviteLink.setSelectionRange(0, 99999);
+                
+                try {
+                    document.execCommand('copy');
+                    const copyBtn = document.getElementById('copyBtn');
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Скопировано!';
+                    copyBtn.style.background = '#ffffff';
+                    copyBtn.style.color = '#000000';
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.style.background = 'transparent';
+                        copyBtn.style.color = '#ffffff';
+                    }, 2000);
+                } catch (err) {
+                    alert('Не удалось скопировать ссылку');
+                }
+            }
+
+            regenerateInviteLink() {
+                const inviteLink = document.getElementById('inviteLink');
+                const currentValue = inviteLink.value;
+                const baseUrl = currentValue.split('/').slice(0, -1).join('/');
+                const newToken = this.generateRandomToken();
+                const newLink = `${baseUrl}/${newToken}`;
+                
+                // Показываем анимацию перегенерации
+                const regenerateBtn = document.getElementById('regenerateBtn');
+                const originalText = regenerateBtn.textContent;
+                regenerateBtn.textContent = 'Генерируется...';
+                regenerateBtn.disabled = true;
+                
+                setTimeout(() => {
+                    inviteLink.value = newLink;
+                    regenerateBtn.textContent = 'Перегенерировано!';
+                    regenerateBtn.style.background = '#ffffff';
+                    regenerateBtn.style.color = '#000000';
+                    
+                    setTimeout(() => {
+                        regenerateBtn.textContent = originalText;
+                        regenerateBtn.style.background = 'transparent';
+                        regenerateBtn.style.color = '#ffffff';
+                        regenerateBtn.disabled = false;
+                    }, 2000);
+                }, 1000);
+            }
+
+            generateRandomToken() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < 8; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            addDetailPanelListeners() {
+                // Обработчики для кнопок "Назад"
+                document.getElementById('memberBackBtn').addEventListener('click', () => {
+                    this.hideMemberDetail();
+                });
+
+                document.getElementById('projectBackBtn').addEventListener('click', () => {
+                    this.hideProjectDetail();
+                });
+
+                // Обработчик для кнопки удаления участника
+                document.getElementById('removeMemberBtn').addEventListener('click', () => {
+                    this.removeMemberFromTeam();
+                });
+            }
+
+            showMemberDetail(teamId, memberIndex) {
+                const members = this.getTeamMembers(teamId);
+                const member = members[memberIndex];
+                const userRole = this.getUserRoleInTeam(teamId);
+                
+                // Обновляем информацию о участнике
+                document.getElementById('memberDetailTitle').textContent = member.name;
+                document.getElementById('memberTelegram').textContent = this.getMemberTelegram(member.name);
+                
+                // Обновляем общие команды
+                this.updateCommonTeams(member.name);
+                
+                // Обновляем задачи участника
+                this.updateMemberTasks(teamId, member.name);
+                
+                // Показываем/скрываем кнопку удаления
+                const removeBtn = document.getElementById('removeMemberBtn');
+                if (userRole === 'Админ' || userRole === 'Создатель') {
+                    removeBtn.style.display = 'block';
+                    removeBtn.dataset.memberName = member.name;
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+                
+                // Показываем детальную панель
+                this.memberDetailPanel.classList.add('visible');
+            }
+
+            showProjectDetail(teamId, projectIndex) {
+                const projects = this.getTeamProjects(teamId);
+                const projectName = projects[projectIndex];
+                
+                // Обновляем информацию о проекте
+                document.getElementById('projectDetailTitle').textContent = projectName;
+                document.getElementById('projectDescription').textContent = this.getProjectDescription(projectName);
+                
+                // Обновляем задачи проекта
+                this.updateProjectTasks(projectName);
+                
+                // Показываем детальную панель
+                this.projectDetailPanel.classList.add('visible');
+            }
+
+            hideMemberDetail() {
+                this.memberDetailPanel.classList.remove('visible');
+            }
+
+            hideProjectDetail() {
+                this.projectDetailPanel.classList.remove('visible');
+            }
+
+            getMemberTelegram(memberName) {
+                const telegrams = {
+                    'Алексей Иванов': '@alexey_ivanov',
+                    'Мария Петрова': '@maria_petrova',
+                    'Дмитрий Сидоров': '@dmitry_sidorov',
+                    'Иван Козлов': '@ivan_kozlov',
+                    'Елена Морозова': '@elena_morozova',
+                    'Сергей Волков': '@sergey_volkov',
+                    'Анна Лебедева': '@anna_lebedev',
+                    'Ольга Новикова': '@olga_novikova',
+                    'Павел Соколов': '@pavel_sokolov',
+                    'Татьяна Попова': '@tatyana_popova',
+                    'Андрей Федоров': '@andrey_fedorov',
+                    'Наталья Медведева': '@natalya_medvedeva',
+                    'Владимир Орлов': '@vladimir_orlov',
+                    'Светлана Зайцева': '@svetlana_zaytseva',
+                    'Роман Смирнов': '@roman_smirnov',
+                    'Юлия Кузнецова': '@yulia_kuznetsova',
+                    'Михаил Васильев': '@mikhail_vasiliev'
+                };
+                return telegrams[memberName] || '@unknown';
+            }
+
+            updateCommonTeams(memberName) {
+                const commonTeamsList = document.getElementById('commonTeamsList');
+                const commonTeams = this.getCommonTeams(memberName);
+                
+                commonTeamsList.innerHTML = '';
+                commonTeams.forEach(team => {
+                    const li = document.createElement('li');
+                    li.className = 'detail-list-item';
+                    li.textContent = team;
+                    commonTeamsList.appendChild(li);
+                });
+            }
+
+            getCommonTeams(memberName) {
+                const commonTeams = {
+                    'Алексей Иванов': ['Frontend Team', 'Backend Team'],
+                    'Мария Петрова': ['Frontend Team', 'Design Team'],
+                    'Дмитрий Сидоров': ['Frontend Team'],
+                    'Иван Козлов': ['Backend Team', 'DevOps Team'],
+                    'Елена Морозова': ['Backend Team', 'QA Team'],
+                    'Сергей Волков': ['Backend Team'],
+                    'Анна Лебедева': ['Backend Team'],
+                    'Ольга Новикова': ['Design Team'],
+                    'Павел Соколов': ['Design Team'],
+                    'Татьяна Попова': ['QA Team'],
+                    'Андрей Федоров': ['QA Team'],
+                    'Наталья Медведева': ['QA Team'],
+                    'Владимир Орлов': ['DevOps Team'],
+                    'Светлана Зайцева': ['DevOps Team'],
+                    'Роман Смирнов': ['Marketing Team'],
+                    'Юлия Кузнецова': ['Marketing Team'],
+                    'Михаил Васильев': ['Marketing Team']
+                };
+                return commonTeams[memberName] || [];
+            }
+
+            updateMemberTasks(teamId, memberName) {
+                const memberTasksList = document.getElementById('memberTasksList');
+                const tasks = this.getMemberTasks(teamId, memberName);
+                
+                memberTasksList.innerHTML = '';
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = 'detail-list-item';
+                    li.textContent = task;
+                    memberTasksList.appendChild(li);
+                });
+            }
+
+            getMemberTasks(teamId, memberName) {
+                const tasks = {
+                    '1': {
+                        'Алексей Иванов': ['React Dashboard - Создать компонент навигации', 'Mobile App - Настроить роутинг'],
+                        'Мария Петрова': ['React Dashboard - Добавить аутентификацию', 'API Integration - Создать API клиент'],
+                        'Дмитрий Сидоров': ['Mobile App - Создать главный экран', 'API Integration - Настроить WebSocket']
+                    },
+                    '2': {
+                        'Иван Козлов': ['Backend API - Создать REST endpoints', 'Database Design - Настроить миграции'],
+                        'Елена Морозова': ['Backend API - Добавить валидацию', 'Microservices - Настроить Docker'],
+                        'Сергей Волков': ['Database Design - Создать схемы', 'Microservices - Настроить мониторинг'],
+                        'Анна Лебедева': ['Backend API - Добавить тесты', 'Database Design - Оптимизировать запросы']
+                    }
+                };
+                return tasks[teamId]?.[memberName] || ['Нет задач'];
+            }
+
+            getProjectDescription(projectName) {
+                const descriptions = {
+                    'React Dashboard': 'Веб-приложение для управления проектами с современным интерфейсом на React',
+                    'Mobile App': 'Мобильное приложение для iOS и Android с нативным интерфейсом',
+                    'API Integration': 'Интеграция с внешними API и настройка WebSocket соединений',
+                    'Backend API': 'RESTful API для управления данными и бизнес-логикой',
+                    'Database Design': 'Проектирование и оптимизация базы данных',
+                    'Microservices': 'Архитектура микросервисов с Docker и Kubernetes',
+                    'UI/UX Design': 'Дизайн пользовательского интерфейса и пользовательского опыта',
+                    'Brand Identity': 'Разработка фирменного стиля и брендинга',
+                    'Prototyping': 'Создание прототипов и макетов интерфейсов',
+                    'Test Automation': 'Автоматизация тестирования с помощью Selenium и Jest',
+                    'Manual Testing': 'Ручное тестирование функциональности приложения',
+                    'Performance Testing': 'Тестирование производительности и нагрузочное тестирование',
+                    'CI/CD Pipeline': 'Настройка непрерывной интеграции и развертывания',
+                    'Infrastructure': 'Управление инфраструктурой и облачными сервисами',
+                    'Monitoring': 'Настройка мониторинга и логирования системы',
+                    'Marketing Campaign': 'Разработка и проведение маркетинговых кампаний',
+                    'Social Media': 'Управление социальными сетями и контентом',
+                    'Analytics': 'Аналитика и отчетность по маркетинговым метрикам'
+                };
+                return descriptions[projectName] || 'Описание проекта не указано';
+            }
+
+            updateProjectTasks(projectName) {
+                const projectTasksList = document.getElementById('projectTasksList');
+                const tasks = this.getProjectTasks(projectName);
+                
+                projectTasksList.innerHTML = '';
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = 'task-item';
+                    
+                    li.innerHTML = `
+                        <div class="task-name">${task.name}</div>
+                        <div class="task-responsible">${task.responsible}</div>
+                    `;
+                    
+                    projectTasksList.appendChild(li);
+                });
+            }
+
+            getProjectTasks(projectName) {
+                const tasks = {
+                    'React Dashboard': [
+                        { name: 'Создать компонент навигации', responsible: 'Алексей Иванов' },
+                        { name: 'Настроить роутинг', responsible: 'Алексей Иванов' },
+                        { name: 'Добавить аутентификацию', responsible: 'Мария Петрова' },
+                        { name: 'Создать дашборд', responsible: 'Дмитрий Сидоров' }
+                    ],
+                    'Mobile App': [
+                        { name: 'Создать главный экран', responsible: 'Дмитрий Сидоров' },
+                        { name: 'Настроить роутинг', responsible: 'Алексей Иванов' },
+                        { name: 'Добавить навигацию', responsible: 'Мария Петрова' },
+                        { name: 'Интегрировать API', responsible: 'Дмитрий Сидоров' }
+                    ],
+                    'API Integration': [
+                        { name: 'Создать API клиент', responsible: 'Мария Петрова' },
+                        { name: 'Настроить WebSocket', responsible: 'Дмитрий Сидоров' },
+                        { name: 'Добавить обработку ошибок', responsible: 'Мария Петрова' },
+                        { name: 'Создать документацию', responsible: 'Алексей Иванов' }
+                    ],
+                    'Backend API': [
+                        { name: 'Создать REST endpoints', responsible: 'Иван Козлов' },
+                        { name: 'Добавить валидацию', responsible: 'Елена Морозова' },
+                        { name: 'Добавить тесты', responsible: 'Анна Лебедева' },
+                        { name: 'Настроить авторизацию', responsible: 'Иван Козлов' }
+                    ],
+                    'Database Design': [
+                        { name: 'Создать схемы', responsible: 'Сергей Волков' },
+                        { name: 'Настроить миграции', responsible: 'Иван Козлов' },
+                        { name: 'Оптимизировать запросы', responsible: 'Анна Лебедева' },
+                        { name: 'Настроить индексы', responsible: 'Сергей Волков' }
+                    ],
+                    'Microservices': [
+                        { name: 'Настроить Docker', responsible: 'Елена Морозова' },
+                        { name: 'Настроить мониторинг', responsible: 'Сергей Волков' },
+                        { name: 'Создать сервисы', responsible: 'Иван Козлов' },
+                        { name: 'Настроить балансировку', responsible: 'Владимир Орлов' }
+                    ],
+                    'UI/UX Design': [
+                        { name: 'Создать макеты', responsible: 'Ольга Новикова' },
+                        { name: 'Разработать прототипы', responsible: 'Павел Соколов' },
+                        { name: 'Создать дизайн-систему', responsible: 'Ольга Новикова' }
+                    ],
+                    'Brand Identity': [
+                        { name: 'Разработать логотип', responsible: 'Ольга Новикова' },
+                        { name: 'Создать фирменный стиль', responsible: 'Павел Соколов' },
+                        { name: 'Подготовить брендбук', responsible: 'Ольга Новикова' }
+                    ],
+                    'Test Automation': [
+                        { name: 'Настроить Selenium', responsible: 'Татьяна Попова' },
+                        { name: 'Создать тесты API', responsible: 'Андрей Федоров' },
+                        { name: 'Настроить CI/CD', responsible: 'Наталья Медведева' }
+                    ],
+                    'Manual Testing': [
+                        { name: 'Тестирование UI', responsible: 'Татьяна Попова' },
+                        { name: 'Тестирование функциональности', responsible: 'Андрей Федоров' },
+                        { name: 'Регрессионное тестирование', responsible: 'Наталья Медведева' }
+                    ],
+                    'Performance Testing': [
+                        { name: 'Нагрузочное тестирование', responsible: 'Андрей Федоров' },
+                        { name: 'Анализ производительности', responsible: 'Наталья Медведева' },
+                        { name: 'Оптимизация', responsible: 'Татьяна Попова' }
+                    ],
+                    'CI/CD Pipeline': [
+                        { name: 'Настроить Jenkins', responsible: 'Владимир Орлов' },
+                        { name: 'Создать pipeline', responsible: 'Светлана Зайцева' },
+                        { name: 'Настроить деплой', responsible: 'Владимир Орлов' }
+                    ],
+                    'Infrastructure': [
+                        { name: 'Настроить серверы', responsible: 'Владимир Орлов' },
+                        { name: 'Управление облаком', responsible: 'Светлана Зайцева' },
+                        { name: 'Мониторинг инфраструктуры', responsible: 'Владимир Орлов' }
+                    ],
+                    'Monitoring': [
+                        { name: 'Настроить логирование', responsible: 'Светлана Зайцева' },
+                        { name: 'Создать дашборды', responsible: 'Владимир Орлов' },
+                        { name: 'Настроить алерты', responsible: 'Светлана Зайцева' }
+                    ],
+                    'Marketing Campaign': [
+                        { name: 'Разработать стратегию', responsible: 'Роман Смирнов' },
+                        { name: 'Создать контент', responsible: 'Юлия Кузнецова' },
+                        { name: 'Запустить кампанию', responsible: 'Михаил Васильев' }
+                    ],
+                    'Social Media': [
+                        { name: 'Управление аккаунтами', responsible: 'Юлия Кузнецова' },
+                        { name: 'Создание контента', responsible: 'Михаил Васильев' },
+                        { name: 'Анализ активности', responsible: 'Роман Смирнов' }
+                    ],
+                    'Analytics': [
+                        { name: 'Настроить метрики', responsible: 'Михаил Васильев' },
+                        { name: 'Создать отчеты', responsible: 'Роман Смирнов' },
+                        { name: 'Анализ данных', responsible: 'Юлия Кузнецова' }
+                    ]
+                };
+                return tasks[projectName] || [{ name: 'Нет задач', responsible: '' }];
+            }
+
+            removeMemberFromTeam() {
+                const memberName = document.getElementById('removeMemberBtn').dataset.memberName;
+                if (confirm(`Вы уверены, что хотите удалить ${memberName} из команды?`)) {
+                    alert(`${memberName} удален из команды`);
+                    this.hideMemberDetail();
+                }
+            }
+
+            addTeamActionListeners() {
+                const createTeamBtn = document.getElementById('createTeamBtn');
+                const joinTeamBtn = document.getElementById('joinTeamBtn');
+                const createNewTeamBtn = document.getElementById('createNewTeamBtn');
+                const cancelActionBtn = document.getElementById('cancelActionBtn');
+
+                createTeamBtn.addEventListener('click', () => {
+                    this.showTeamActionModal();
+                });
+
+                joinTeamBtn.addEventListener('click', () => {
+                    this.hideTeamActionModal();
+                    this.showJoinTeamModal();
+                });
+
+                createNewTeamBtn.addEventListener('click', () => {
+                    this.hideTeamActionModal();
+                    this.showCreateTeamModal();
+                });
+
+                cancelActionBtn.addEventListener('click', () => {
+                    this.hideTeamActionModal();
+                });
+
+                // Закрытие модального окна при клике вне его
+                this.teamActionModal.addEventListener('click', (e) => {
+                    if (e.target === this.teamActionModal) {
+                        this.hideTeamActionModal();
+                    }
+                });
+            }
+
+            addJoinTeamListeners() {
+                const cancelJoinBtn = document.getElementById('cancelJoinBtn');
+                const joinTeamSubmitBtn = document.getElementById('joinTeamSubmitBtn');
+
+                cancelJoinBtn.addEventListener('click', () => {
+                    this.hideJoinTeamModal();
+                });
+
+                this.joinTeamForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.joinTeam();
+                });
+
+                // Закрытие модального окна при клике вне его
+                this.joinTeamModal.addEventListener('click', (e) => {
+                    if (e.target === this.joinTeamModal) {
+                        this.hideJoinTeamModal();
+                    }
+                });
+            }
+
+            addCreateTeamListeners() {
+                const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+                const createTeamSubmitBtn = document.getElementById('createTeamSubmitBtn');
+
+                cancelCreateBtn.addEventListener('click', () => {
+                    this.hideCreateTeamModal();
+                });
+
+                this.createTeamForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createNewTeam();
+                });
+
+                // Закрытие модального окна при клике вне его
+                this.createTeamModal.addEventListener('click', (e) => {
+                    if (e.target === this.createTeamModal) {
+                        this.hideCreateTeamModal();
+                    }
+                });
+            }
+
+            addDissolveTeamListeners() {
+                this.dissolveTeamBtn.addEventListener('click', () => {
+                    this.dissolveTeam();
+                });
+            }
+
+            showTeamActionModal() {
+                this.teamActionModal.classList.add('active');
+            }
+
+            hideTeamActionModal() {
+                this.teamActionModal.classList.remove('active');
+            }
+
+            showJoinTeamModal() {
+                this.joinTeamModal.classList.add('active');
+                document.getElementById('inviteLinkInput').focus();
+            }
+
+            hideJoinTeamModal() {
+                this.joinTeamModal.classList.remove('active');
+                this.joinTeamForm.reset();
+            }
+
+            showCreateTeamModal() {
+                this.createTeamModal.classList.add('active');
+                document.getElementById('teamNameInput').focus();
+            }
+
+            hideCreateTeamModal() {
+                this.createTeamModal.classList.remove('active');
+                this.createTeamForm.reset();
+            }
+
+            createNewTeam() {
+                const teamName = document.getElementById('teamNameInput').value.trim();
+                const teamDescription = document.getElementById('teamDescriptionInput').value.trim();
+
+                if (!teamName) {
+                    alert('Пожалуйста, введите название команды');
+                    return;
+                }
+
+                // Создаем новую команду
+                const newTeam = {
+                    id: this.nextTeamId.toString(),
+                    name: teamName,
+                    description: teamDescription || 'Описание не указано',
+                    role: 'Создатель'
+                };
+
+                // Добавляем команду в mock-данные
+                this.addTeamToMockData(newTeam);
+
+                // Создаем HTML для новой команды
+                this.addTeamToGrid(newTeam);
+
+                // Закрываем модальное окно
+                this.hideCreateTeamModal();
+
+                // Показываем уведомление
+                alert(`Команда "${teamName}" успешно создана!`);
+            }
+
+            addTeamToMockData(team) {
+                // Добавляем команду в mock-данные
+                this.teams[team.id] = {
+                    name: team.name,
+                    description: team.description,
+                    projects: ['Новый проект'],
+                    members: [this.currentUser],
+                    inviteToken: this.generateRandomToken(8)
+                };
+
+                // Добавляем роль пользователя
+                this.userRoles[team.id] = 'Создатель';
+
+                this.nextTeamId++;
+            }
+
+            addTeamToGrid(team) {
+                const teamsGrid = document.getElementById('teamsGrid');
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+                teamCard.setAttribute('data-team', team.id);
+
+                teamCard.innerHTML = `
+                    <div class="team-notifications">0</div>
+                    <div class="team-name">${team.name}</div>
+                    <div class="team-role">${team.role}</div>
+                `;
+
+                // Добавляем обработчик клика
+                teamCard.addEventListener('click', () => {
+                    this.selectTeam(teamCard);
+                });
+
+                teamsGrid.appendChild(teamCard);
+            }
+
+            dissolveTeam() {
+                if (!this.selectedTeam) return;
+
+                const teamId = this.selectedTeam.getAttribute('data-team');
+                const teamName = this.selectedTeam.querySelector('.team-name').textContent;
+
+                if (confirm(`Вы уверены, что хотите расформировать команду "${teamName}"? Это действие нельзя отменить.`)) {
+                    // Удаляем команду из DOM
+                    this.selectedTeam.remove();
+
+                    // Удаляем из mock-данных
+                    delete this.teams[teamId];
+                    delete this.userRoles[teamId];
+
+                    // Скрываем панель информации
+                    this.hideTeamInfoPanel();
+
+                    // Сбрасываем выбранную команду
+                    this.selectedTeam = null;
+
+                    alert(`Команда "${teamName}" расформирована`);
+                }
+            }
+
+            updateDissolveButtonVisibility(teamId) {
+                const userRole = this.getUserRoleInTeam(teamId);
+                if (userRole === 'Создатель' || userRole === 'Админ') {
+                    this.dissolveTeamBtn.style.display = 'block';
+                    this.leaveTeamBtn.style.display = 'none';
+                } else {
+                    this.dissolveTeamBtn.style.display = 'none';
+                    this.leaveTeamBtn.style.display = 'block';
+                }
+            }
+
+            addLeaveTeamListeners() {
+                this.leaveTeamBtn.addEventListener('click', () => {
+                    this.leaveTeam();
+                });
+            }
+
+            leaveTeam() {
+                if (!this.selectedTeam) return;
+
+                const teamId = this.selectedTeam.getAttribute('data-team');
+                const teamName = this.selectedTeam.querySelector('.team-name').textContent;
+
+                if (confirm(`Вы уверены, что хотите покинуть команду "${teamName}"?`)) {
+                    // Удаляем команду из DOM
+                    this.selectedTeam.remove();
+
+                    // Удаляем из mock-данных
+                    delete this.teams[teamId];
+                    delete this.userRoles[teamId];
+
+                    // Скрываем панель информации
+                    this.hideTeamInfoPanel();
+
+                    // Сбрасываем выбранную команду
+                    this.selectedTeam = null;
+
+                    alert(`Вы покинули команду "${teamName}"`);
+                }
+            }
+
+            joinTeam() {
+                const inviteLink = document.getElementById('inviteLinkInput').value.trim();
+
+                if (!inviteLink) {
+                    alert('Пожалуйста, введите ссылку-приглашение');
+                    return;
+                }
+
+                // Симуляция присоединения к команде
+                if (inviteLink.includes('deligate.app/join/')) {
+                    // Создаем новую команду на основе ссылки
+                    const teamToken = inviteLink.split('/').pop();
+                    const newTeam = {
+                        id: this.nextTeamId.toString(),
+                        name: `Команда ${teamToken.substring(0, 8)}`,
+                        description: 'Команда, к которой вы присоединились',
+                        role: 'Участник'
+                    };
+
+                    // Добавляем команду в mock-данные
+                    this.addTeamToMockData(newTeam);
+
+                    // Создаем HTML для новой команды
+                    this.addTeamToGrid(newTeam);
+
+                    // Закрываем модальное окно
+                    this.hideJoinTeamModal();
+
+                    // Показываем уведомление
+                    alert(`Вы успешно присоединились к команде!`);
+                } else {
+                    alert('Неверная ссылка-приглашение');
+                }
+            }
+
+            // Методы для работы с задачами
+            addTasksPageListeners() {
+                const teamSelector = document.getElementById('teamSelector');
+                const addTaskBtn = document.getElementById('addTaskBtn');
+                const taskModal = document.getElementById('taskModal');
+                const taskForm = document.getElementById('taskForm');
+                const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+
+                teamSelector.addEventListener('change', (e) => {
+                    this.selectedTeamForTasks = e.target.value;
+                    this.loadTasksForTeam(e.target.value);
+                });
+
+                addTaskBtn.addEventListener('click', () => {
+                    this.showTaskModal();
+                });
+
+                cancelTaskBtn.addEventListener('click', () => {
+                    this.hideTaskModal();
+                });
+
+                taskForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveTask();
+                });
+
+                taskModal.addEventListener('click', (e) => {
+                    if (e.target === taskModal) {
+                        this.hideTaskModal();
+                    }
+                });
+
+                this.setupDragAndDrop();
+            }
+
+            showTasksPage() {
+                console.log('Показываем страницу задач');
+                const tasksPage = document.getElementById('tasksPage');
+                console.log('Элемент tasksPage:', tasksPage);
+                tasksPage.classList.add('active');
+                console.log('Классы tasksPage:', tasksPage.classList);
+                this.populateTeamSelector();
+            }
+
+            hideTasksPage() {
+                console.log('Скрываем страницу задач');
+                const tasksPage = document.getElementById('tasksPage');
+                tasksPage.classList.remove('active');
+            }
+
+            populateTeamSelector() {
+                console.log('Заполняем селектор команд');
+                const teamSelector = document.getElementById('teamSelector');
+                console.log('Элемент teamSelector:', teamSelector);
+                teamSelector.innerHTML = '<option value="">Выберите команду</option>';
+                
+                Object.keys(this.teams).forEach(teamId => {
+                    const team = this.teams[teamId];
+                    const option = document.createElement('option');
+                    option.value = teamId;
+                    option.textContent = team.name;
+                    teamSelector.appendChild(option);
+                });
+                console.log('Команды добавлены в селектор');
+            }
+
+            loadTasksForTeam(teamId) {
+                console.log('Загружаем задачи для команды:', teamId);
+                if (!teamId) return;
+
+                const tasks = this.tasks[teamId] || [];
+                console.log('Задачи команды:', tasks);
+                const userRole = this.getUserRoleInTeam(teamId);
+                const isAdmin = userRole === 'Админ' || userRole === 'Создатель';
+                console.log('Роль пользователя:', userRole, 'Админ:', isAdmin);
+
+                // Очищаем все колонки
+                const columns = ['todo', 'inprocess', 'testing', 'remake', 'done'];
+                columns.forEach(status => {
+                    const column = document.getElementById(`${status}Column`);
+                    column.innerHTML = '';
+                });
+
+                // Фильтруем задачи в зависимости от роли
+                const filteredTasks = isAdmin ? tasks : tasks.filter(task => task.responsible === this.currentUser);
+                console.log('Отфильтрованные задачи:', filteredTasks);
+
+                // Добавляем задачи в соответствующие колонки
+                filteredTasks.forEach(task => {
+                    this.addTaskToColumn(task);
+                });
+
+                // Обновляем список ответственных
+                this.updateResponsibleList(teamId);
+            }
+
+            addTaskToColumn(task) {
+                const column = document.getElementById(`${task.status}Column`);
+                const taskCard = this.createTaskCard(task);
+                column.appendChild(taskCard);
+            }
+
+            createTaskCard(task) {
+                const card = document.createElement('div');
+                card.className = 'task-card';
+                card.draggable = true;
+                card.dataset.taskId = task.id;
+
+                const userRole = this.getUserRoleInTeam(this.selectedTeamForTasks);
+                const isAdmin = userRole === 'Админ' || userRole === 'Создатель';
+
+                card.innerHTML = `
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-responsible">${task.responsible}</div>
+                    <div class="task-deadline">${new Date(task.deadline).toLocaleDateString('ru-RU')}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                `;
+
+                // Добавляем обработчики
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', task.id);
+                    card.classList.add('dragging');
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
+                if (isAdmin) {
+                    card.addEventListener('click', () => {
+                        this.editTask(task);
+                    });
+                }
+
+                return card;
+            }
+
+            setupDragAndDrop() {
+                const columns = document.querySelectorAll('.column-content');
+                
+                columns.forEach(column => {
+                    column.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        column.classList.add('drag-over');
+                    });
+
+                    column.addEventListener('dragleave', () => {
+                        column.classList.remove('drag-over');
+                    });
+
+                    column.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        column.classList.remove('drag-over');
+                        
+                        const taskId = e.dataTransfer.getData('text/plain');
+                        const newStatus = column.parentElement.dataset.status;
+                        
+                        this.moveTask(taskId, newStatus);
+                    });
+                });
+            }
+
+            moveTask(taskId, newStatus) {
+                if (!this.selectedTeamForTasks) return;
+
+                const tasks = this.tasks[this.selectedTeamForTasks];
+                const task = tasks.find(t => t.id === taskId);
+                
+                if (task) {
+                    task.status = newStatus;
+                    this.loadTasksForTeam(this.selectedTeamForTasks);
+                }
+            }
+
+            showTaskModal(task = null) {
+                const modal = document.getElementById('taskModal');
+                const title = document.getElementById('taskModalTitle');
+                const form = document.getElementById('taskForm');
+                
+                if (task) {
+                    title.textContent = 'Редактировать задачу';
+                    document.getElementById('taskTitleInput').value = task.title;
+                    document.getElementById('taskDescriptionInput').value = task.description || '';
+                    document.getElementById('taskResponsibleInput').value = task.responsible;
+                    document.getElementById('taskDeadlineInput').value = task.deadline;
+                } else {
+                    title.textContent = 'Создать задачу';
+                    form.reset();
+                }
+                
+                modal.classList.add('active');
+            }
+
+            hideTaskModal() {
+                const modal = document.getElementById('taskModal');
+                modal.classList.remove('active');
+            }
+
+            saveTask() {
+                const title = document.getElementById('taskTitleInput').value.trim();
+                const description = document.getElementById('taskDescriptionInput').value.trim();
+                const responsible = document.getElementById('taskResponsibleInput').value;
+                const deadline = document.getElementById('taskDeadlineInput').value;
+
+                if (!title || !responsible || !deadline) {
+                    alert('Пожалуйста, заполните все обязательные поля');
+                    return;
+                }
+
+                if (!this.selectedTeamForTasks) {
+                    alert('Выберите команду');
+                    return;
+                }
+
+                const newTask = {
+                    id: `task-${this.currentTaskId++}`,
+                    title,
+                    description,
+                    responsible,
+                    deadline,
+                    status: 'todo'
+                };
+
+                if (!this.tasks[this.selectedTeamForTasks]) {
+                    this.tasks[this.selectedTeamForTasks] = [];
+                }
+
+                this.tasks[this.selectedTeamForTasks].push(newTask);
+                this.loadTasksForTeam(this.selectedTeamForTasks);
+                this.hideTaskModal();
+            }
+
+            editTask(task) {
+                this.showTaskModal(task);
+            }
+
+            updateResponsibleList(teamId) {
+                const responsibleSelect = document.getElementById('taskResponsibleInput');
+                const team = this.teams[teamId];
+                
+                responsibleSelect.innerHTML = '<option value="">Выберите ответственного</option>';
+                
+                if (team && team.members) {
+                    team.members.forEach(member => {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = member;
+                        responsibleSelect.appendChild(option);
+                    });
+                }
+            }
+
+        }
+
+        // Запускаем приложение после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new Dashboard();
+        });
+    </script>
+</body>
+</html>
